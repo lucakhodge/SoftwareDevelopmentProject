@@ -1,0 +1,30 @@
+<%- include ('../partials/head') %>
+<%- include ('../partials/menu') %>
+
+<main>
+  <div class="container">
+    <!-- THE REST OF YOUR HTML CODE GOES HERE -->
+    <% if (locals.message) { %>
+        <div
+          class="alert alert-<%- locals.error ? 'danger' : 'success' %>"
+          role="alert"
+        >
+          <%= message %>
+        </div>
+        <% } %>
+
+    <h1>Login</h1>
+    <form action="/login" method="POST">
+        <label for="username">Name:</label>
+        <input type="text" id="username" name="username" />
+      
+        <label for="password">Password:</label>
+        <input type="text" id="password" name="password" />
+      
+        <input type="submit" value="Login" />
+      </form>
+      <a href="/register"> Create account. </a>
+  </div>
+</main>
+
+<%- include ('../partials/footer') %>

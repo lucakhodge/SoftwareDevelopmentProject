@@ -1,0 +1,34 @@
+<%- include ('../partials/head') %>
+<%- include ('../partials/menu') %>
+
+<main>
+  <div class="container">
+    <% if (locals.message) { %>
+        <div
+          class="alert alert-<%- locals.error ? 'danger' : 'success' %>"
+          role="alert"
+        >
+          <%= message %>
+        </div>
+        <% } %>
+    <div class="row"> 
+
+    <% events.forEach((event) => { %>
+        <div class ="col">
+        <div class="card" style="width: 18rem;">
+            <img src= <%- event.images[0].url %> class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title"> <%- event.name %> </h5>
+              <p class="card-text"> Date: <%- event.dates.start.localDate %>  Time: <%- event.dates.start.localTime%> </p>
+              <a href= <%- event.url %> class ="btn btn-primary">Book Now</a>
+            </div>
+          </div>
+        </div>
+    <% }); %>
+
+</div>
+
+  </div>
+</main>
+
+<%- include ('../partials/footer') %>
