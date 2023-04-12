@@ -97,44 +97,52 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const q = "SELECT * FROM users WHERE username = $1;";
-  //   const q = "SELECT * FROM users;";
-  //   console.log(req.body.username);
-  db.any(q, [req.body.username])
-    .then(async (data) => {
-      if (data.length === 0) {
-        res.render("pages/login", {
+  // const q = "SELECT * FROM users WHERE username = $1;";
+  // db.any(q, [req.body.username])
+  //   .then(async (data) => {
+  //     if (data.length === 0) {
+        
+  //       res.render("pages/login", {
+  //         error: true,
+  //         message: "Username does not exist",
+  //         status: "400"
+  //       });
+  //     } else {
+  //       let user = data[0];
+  //       const match = await bcrypt.compare(req.body.password, user.password);
+  //       if (match) {
+  //         req.session.user = user;
+  //         req.session.save();
+  //         // res.json({status: '200', message: 'Success'});
+  //         res.redirect("/discover");
+          
+  //       } else {
+  //         //throw error
+  //         res.render("pages/login", {
+  //           error: true,
+  //           message: "Username and password do not match.",
+  //         });
+  //       }
+  //       // res.send(user);
+  //       res.render("pages/login", {
+  //         error: true,
+  //         message: "Database query failed.",
+  //       });
+  //     }
+  //   })
+  //   .catch((err) => {
+  //     //   res.send(err);
+  //     res.render("pages/login", {
+  //       error: false,
+  //       message: "Logged out sucessfully",
+  //     });
+  //   });
+
+          res.json({
           error: true,
           message: "Username does not exist",
-        });
-      } else {
-        let user = data[0];
-        const match = await bcrypt.compare(req.body.password, user.password);
-        if (match) {
-          req.session.user = user;
-          req.session.save();
-          res.redirect("/discover");
-        } else {
-          //throw error
-          res.render("pages/login", {
-            error: true,
-            message: "Username and password do not match.",
-          });
-        }
-        // res.send(user);
-        res.render("pages/login", {
-          error: true,
-          message: "Database query failed.",
-        });
-      }
-    })
-    .catch((err) => {
-      //   res.send(err);
-      res.render("pages/login", {
-        error: false,
-        message: "Logged out sucessfully",
-      });
-    });
+          //status: "400"
+        }).status(400);
 });
 
 app.get("/home", (req, res) => {
@@ -157,6 +165,10 @@ app.get("/logout", (req, res) => {
   });
 });
 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
 // starting the server and keeping the connection open to listen for more requests
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log("Server is listening on port 3000");
