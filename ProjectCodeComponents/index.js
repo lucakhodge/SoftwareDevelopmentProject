@@ -84,8 +84,8 @@ app.post("/register", async (req, res) => {
       res.redirect("/login");
     })
     .catch((err) => {
-      console.log("MY ERROR", err);
-      res.render("pages/register", {
+      // console.log("MY ERROR", err);
+      res.status(400).render("pages/register", {
         error: true,
         message: "Could not add username and password into database.",
       });
@@ -97,52 +97,56 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  // const q = "SELECT * FROM users WHERE username = $1;";
-  // db.any(q, [req.body.username])
-  //   .then(async (data) => {
-  //     if (data.length === 0) {
-        
-  //       res.render("pages/login", {
-  //         error: true,
-  //         message: "Username does not exist",
-  //         status: "400"
-  //       });
-  //     } else {
-  //       let user = data[0];
-  //       const match = await bcrypt.compare(req.body.password, user.password);
-  //       if (match) {
-  //         req.session.user = user;
-  //         req.session.save();
-  //         // res.json({status: '200', message: 'Success'});
-  //         res.redirect("/discover");
-          
-  //       } else {
-  //         //throw error
-  //         res.render("pages/login", {
-  //           error: true,
-  //           message: "Username and password do not match.",
-  //         });
-  //       }
-  //       // res.send(user);
-  //       res.render("pages/login", {
-  //         error: true,
-  //         message: "Database query failed.",
-  //       });
-  //     }
-  //   })
-  //   .catch((err) => {
-  //     //   res.send(err);
-  //     res.render("pages/login", {
-  //       error: false,
-  //       message: "Logged out sucessfully",
-  //     });
-  //   });
+  const q = "SELECT * FROM users WHERE username = $1;";
+  db.any(q, [req.body.username])
+    .then(async (data) => {
+      if (data.length === 0) {
+        //if username not found
+        // res.status(400).render("pages/login", {
+        //   error: true,
+        //   message: "Username does not exist",
+        // });
+        // res.status(400).json({
+        //   error: true,
+        //   message: "Username does not exist",
+        // });
+        // .render("pages/login");
 
-          res.status(400).json({
+        res.status(400).render("pages/login", {
           error: true,
           message: "Username does not exist",
-          //status: "400"
         });
+      } else {
+        let user = data[0];
+        const match = await bcrypt.compare(req.body.password, user.password);
+        if (match) {
+          //if password matches
+          req.session.user = user;
+          req.session.save();
+          res.status(200).redirect("/home");
+          // res.status(200).json({ status: "200", message: "Success" });
+          // res.status(200).json({ message: "Success" }).redirect("/home");
+        } else {
+          //if password does not match
+          res.status(400).render("pages/login", {
+            error: true,
+            message: "Username and password do not match.",
+          });
+        }
+      }
+    })
+    .catch((err) => {
+      //db query failed
+      res.status(400).render("pages/login", {
+        error: true,
+        message: "Database query failed.",
+      });
+    });
+
+  // res.status(400).json({
+  //   error: true,
+  //   message: "Username does not exist",
+  // });
 });
 
 app.get("/home", (req, res) => {
@@ -165,10 +169,11 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
+app.get("/welcome", (req, res) => {
+  res.json({ status: "success", message: "Welcome!" });
 });
 
 // starting the server and keeping the connection open to listen for more requests
 module.exports = app.listen(3000);
+// app.listen(3000);
 console.log("Server is listening on port 3000");
