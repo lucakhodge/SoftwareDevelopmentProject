@@ -1,4 +1,4 @@
-April 11 Meeting:
+April 18 Meeting:
 
 
 -figure out profile/home page
@@ -12,3 +12,5 @@ April 11 Meeting:
 Add member progress below.
 \
 Alex: Figure out upload API, commit branch rework
+\
+Aidan: Integration of PDF links into into the data base
