@@ -9,6 +9,6 @@ April 11 Meeting:
 \
 -Make sure that the commits are properly being pr'ed.
 \
-Add member progress below:
+Add member progress below.
 \
 Alex: Figure out upload API, commit branch rework
