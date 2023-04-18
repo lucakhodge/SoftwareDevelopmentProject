@@ -30,7 +30,7 @@ describe("Server!", () => {
     chai
       .request(server)
       .post("/register")
-      .send({ username: "abc", password: "123" })
+      .send({username: "abc", password: "123" })
       .end((err, res) => {
         expect(res).to.have.status(200);
         // expect(res.body.message).to.equals("Success");
@@ -73,6 +73,6 @@ describe("Server!", () => {
         // expect(res.text).to.include("Username does not exist");
         // expect(res.locals.message).to.equals("Username does not exist");
         done();
-      });
+});
   });
 });
