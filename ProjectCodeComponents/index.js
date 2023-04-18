@@ -10,6 +10,7 @@ const session = require("express-session"); // To set the session object. To sto
 const bcrypt = require("bcrypt"); //  To hash passwords
 const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part B.
 const read = require("body-parser/lib/read");
+const cloudinary = require('cloudinary').v2;
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -35,6 +36,40 @@ db.connect()
   .catch((error) => {
     console.log("ERROR:", error.message || error);
   });
+
+
+
+
+//Cloudinary API:
+
+//configuration
+cloudinary.config({
+  cloud_name: "dfx20hhlk",
+  api_key: "676725369999912",
+  api_secret: "cISXL5XpemBW1clvfGWWUJe1mqg"
+});
+
+const res = cloudinary.uploader.upload('https://upload.wikimedia.org/wikipedia/commons/a/ae/Olympic_flag.jpg', {public_id: "olympic_flag"})
+
+res.then((data) => {
+  console.log(data);
+  console.log(data.secure_url);
+}).catch((err) => {
+  console.log(err);
+});
+
+// Generate 
+const url = cloudinary.url("olympic_flag", {
+  width: 100,
+  height: 150,
+  Crop: 'fill'
+});
+
+
+// The output url
+console.log(url);
+// https://res.cloudinary.com/<cloud_name>/image/upload/h_150,w_100/olympic_flag
+
 
 // *****************************************************
 // <!-- Section 3 : App Settings -->
