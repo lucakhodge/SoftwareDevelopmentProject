@@ -1,6 +1,6 @@
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,  /* Right now ID auto increments, could lead to secuirity risks */
-    username VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL, /* reference table of liked */
     password VARCHAR(50) NOT NULL
 );
 
