@@ -10,7 +10,7 @@ const session = require("express-session"); // To set the session object. To sto
 const bcrypt = require("bcrypt"); //  To hash passwords
 const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part B.
 const read = require("body-parser/lib/read");
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require("cloudinary").v2;
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -18,33 +18,61 @@ const cloudinary = require('cloudinary').v2;
 
 // database configuration
 const dbConfig = {
-	host: "db", // the database server
-	port: 5432, // the database port
-	database: process.env.POSTGRES_DB, // the database name
-	user: process.env.POSTGRES_USER, // the user account to connect with
-	password: process.env.POSTGRES_PASSWORD, // the password of the user account
+  host: "db", // the database server
+  port: 5432, // the database port
+  database: process.env.POSTGRES_DB, // the database name
+  user: process.env.POSTGRES_USER, // the user account to connect with
+  password: process.env.POSTGRES_PASSWORD, // the password of the user account
 };
 
 const db = pgp(dbConfig);
 
 // test your database
 db.connect()
-	.then((obj) => {
-		console.log("Database connection successful"); // you can view this message in the docker compose logs
-		obj.done(); // success, release the connection;
-	})
-	.catch((error) => {
-		console.log("ERROR:", error.message || error);
-	});
-
-
-
+  .then((obj) => {
+    console.log("Database connection successful"); // you can view this message in the docker compose logs
+    obj.done(); // success, release the connection;
+  })
+  .catch((error) => {
+    console.log("ERROR:", error.message || error);
+  });
 
 //Cloudinary API:
+
+//configuration
+cloudinary.config({
+  cloud_name: "dfx20hhlk",
+  api_key: "676725369999912",
+  api_secret: "cISXL5XpemBW1clvfGWWUJe1mqg"
+});
+
+const res = cloudinary.uploader.upload('https://upload.wikimedia.org/wikipedia/commons/a/ae/Olympic_flag.jpg', {public_id: "olympic_flag"})
+
+res.then((data) => {
+  console.log(data);
+  console.log(data.secure_url);
+}).catch((err) => {
+  console.log(err);
+});
+
+// Generate 
+const url = cloudinary.url("olympic_flag", {
+  width: 100,
+  height: 150,
+  Crop: 'fill'
+});
+
+
+// The output url
+console.log(url);
+// https://res.cloudinary.com/<cloud_name>/image/upload/h_150,w_100/olympic_flag
 
 
 
 //Uploadcare:
+
+import uploadcare from 'uploadcare-widget/uploadcare.lang.en.min.js'
+
 
 
 // *****************************************************
@@ -56,32 +84,31 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 
 // initialize session variables
 app.use(
-	session({
-		secret: process.env.SESSION_SECRET,
-		saveUninitialized: false,
-		resave: false,
-	})
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+  })
 );
 
 app.use(
-	bodyParser.urlencoded({
-		extended: true,
-	})
+  bodyParser.urlencoded({
+    extended: true,
+  })
 );
 
 ///////   API ROUTES    //////////
 
 app.get("/", (req, res) => {
-	res.redirect("/login");
+  res.redirect("/login");
 });
 
 app.get("/register", (req, res) => {
-	res.render("pages/register");
+  res.render("pages/register");
 });
 
 // Register
 app.post("/register", async (req, res) => {
-
   //hash the password using bcrypt library
   const hash = await bcrypt.hash(req.body.password, 10);
   //   res.redirect("/login");
@@ -102,15 +129,13 @@ app.post("/register", async (req, res) => {
         message: "Could not add username and password into database.",
       });
     });
-
 });
 
 app.get("/login", (req, res) => {
-	res.render("pages/login");
+  res.render("pages/login");
 });
 
 app.post("/login", async (req, res) => {
-
   const q = "SELECT * FROM users WHERE username = $1;";
   db.any(q, [req.body.username])
     .then(async (data) => {
@@ -137,7 +162,7 @@ app.post("/login", async (req, res) => {
           //if password matches
           req.session.user = user;
           req.session.save();
-          res.status(200).redirect("/home");
+          res.status(200).redirect("/profile");
           // res.status(200).json({ status: "200", message: "Success" });
           // res.status(200).json({ message: "Success" }).redirect("/home");
         } else {
@@ -161,15 +186,14 @@ app.post("/login", async (req, res) => {
   //   error: true,
   //   message: "Username does not exist",
   // });
-
 });
 
-app.get("/home", (req, res) => {
-	res.render("pages/home");
+app.get("/profile", (req, res) => {
+  res.render("pages/profile");
 });
 
 app.get("/search", (req, res) => {
-	res.render("pages/search");
+  res.render("pages/search");
 });
 
 // EXAMPLE GET API CALL
@@ -222,15 +246,15 @@ app.get("/search", (req, res) => {
 // });
 
 app.get("/upload", (req, res) => {
-	res.render("pages/upload");
+  res.render("pages/upload");
 });
 
 app.get("/logout", (req, res) => {
-	req.session.destroy();
-	res.render("pages/login", {
-		error: false,
-		message: "Logged out sucessfully",
-	});
+  req.session.destroy();
+  res.render("pages/login", {
+    error: false,
+    message: "Logged out sucessfully",
+  });
 });
 
 app.get("/welcome", (req, res) => {

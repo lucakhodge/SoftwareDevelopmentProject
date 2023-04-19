@@ -1,9 +1,9 @@
-START FROM MAIN
+START ON MAIN BRANCH
 
 1. git pull
 2. git checkout -b "feature/\_\_\_\_"
 
-MAKE CHANGES
+MAKE CHANGES ON FEATURE BRANCH
 
 3. git stash
 4. git checkout main
@@ -13,3 +13,6 @@ MAKE CHANGES
 8. git stash pop
 
 ADD / COMMIT / PUSH
+
+9. create pull request on GitHub
+10. request to merge
