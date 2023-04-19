@@ -5,13 +5,17 @@
   <div class="container">
     <!-- THE REST OF YOUR HTML CODE GOES HERE -->
       <%- include  ('../partials/message') %>
+
+        <div class="card">
+          <h1>Profile</h1>
+          <div>Welcome <%= username %> </div>
+        </div>
         
-        <h1>Profile</h1>
-        <div>Welcome <%= username %> </div>
 
         <div class='row'>
           <div class = 'col'>
-            <h3>My uploads</h3>
+            <div class="card">
+              <h3 >My uploads</h3>
             <table class="table">
                 <thead>
                 
@@ -30,10 +34,12 @@
                     </tr>
                 <% }); %>
                 </tbody>
-            </table>
+            </table></div>
+            
           </div>
           <div class = 'col'>
-            <h3>Liked</h3>
+            <div class = 'card'>
+              <h3>Liked</h3>
             <table class="table">
                   <thead>
                   
@@ -52,7 +58,8 @@
                       </tr>
                   <% }); %>
                   </tbody>
-              </table>
+              </table></div>
+            
           </div>
         </div>
 

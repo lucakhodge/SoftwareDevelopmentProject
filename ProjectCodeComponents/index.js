@@ -190,10 +190,14 @@ app.post("/login", async (req, res) => {
 
 app.get("/profile", (req, res) => {
   var username;
+  // if (isLoggedIn(req.session)) {
   if (req.session.hasOwnProperty("user")) {
+    //case: logged in
     username = req.session.user.username;
   } else {
-    username = "NOT LOGGED IN";
+    //case: not logged in
+    // username = "NOT LOGGED IN";
+    res.redirect("/login");
   }
   res.render("pages/profile", {
     username: username,
