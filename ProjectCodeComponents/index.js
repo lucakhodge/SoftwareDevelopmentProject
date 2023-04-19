@@ -189,7 +189,24 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
-  res.render("pages/profile");
+  var username;
+  if (req.session.hasOwnProperty("user")) {
+    username = req.session.user.username;
+  } else {
+    username = "NOT LOGGED IN";
+  }
+  res.render("pages/profile", {
+    username: username,
+    uploaded: [
+      { title: "upload 1", link: "ul1" },
+      { title: "upload 2", link: "ul2" },
+      { title: "upload 3", link: "ul3" },
+    ],
+    liked: [
+      { title: "liked 1", link: "ll1" },
+      { title: "liked 2", link: "ll2" },
+    ],
+  });
 });
 
 app.get("/search", (req, res) => {
