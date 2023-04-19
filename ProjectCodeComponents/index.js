@@ -71,7 +71,6 @@ console.log(url);
 
 //Uploadcare:
 
-import uploadcare from 'uploadcare-widget/uploadcare.lang.en.min.js'
 
 
 
