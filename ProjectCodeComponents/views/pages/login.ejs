@@ -8,15 +8,18 @@
 
     <h1>Login</h1>
     <form action="/login" method="POST">
-        <label for="username">Name:</label>
-        <input type="text" id="username" name="username" />
-      
+      <div class="mb-3">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" class="form-control"/>
+      </div>
+      <div class="mb-3">
         <label for="password">Password:</label>
-        <input type="text" id="password" name="password" />
-      
-        <input type="submit" value="Login" />
+        <input type="text" id="password" name="password" class="form-control" />
+      </div>
+      <p style="float:left">Don't have an account? <a href="/register">Create Account</a></p>
+      <button style="float:right" type="submit" class="btn btn-primary">Login</button>
       </form>
-      <a href="/register"> Create account. </a>
+      <!-- <a href="/register"> Create account. </a> -->
   </div>
 </main>
 
