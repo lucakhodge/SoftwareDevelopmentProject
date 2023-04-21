@@ -4,7 +4,7 @@ CREATE TABLE Users(
 );
 
 
--- DROP TABLE IF EXISTS StudyGuides CASCADE;
+DROP TABLE IF EXISTS StudyGuides CASCADE;
 CREATE TABLE StudyGuides(
     SG_id SERIAL PRIMARY KEY,
     name VARCHAR(50),
@@ -13,7 +13,7 @@ CREATE TABLE StudyGuides(
     dataLink VARCHAR(50) /* Assuming that we will be hosting PDF's online using a API and a link to said data */
 );
 
--- DROP TABLE IF EXISTS tags CASCADE;
+DROP TABLE IF EXISTS tags CASCADE;
 CREATE TABLE tags(
     tag_id SERIAL PRIMARY KEY,
     tag_name VARCHAR(20)
@@ -24,13 +24,13 @@ INSERT INTO tags (tag_id, tag_name) values (2, 'Article');
 INSERT INTO tags (tag_id, tag_name) values (3, 'Practice Tests');
 
 
--- DROP TABLE IF EXISTS StudyGuides_to_Tags CASCADE;
+DROP TABLE IF EXISTS StudyGuides_to_Tags CASCADE;
 CREATE TABLE StudyGuides_to_Tags(
     SG_id INT,
     tag_id INT
 );
 
--- DROP TABLE IF EXISTS LikedStudyGuides_to_Users CASCADE;
+DROP TABLE IF EXISTS LikedStudyGuides_to_Users CASCADE;
 CREATE TABLE LikedStudyGuides_to_Users(
     SG_id INT,
     username VARCHAR(50)
