@@ -282,6 +282,10 @@ app.get("/welcome", (req, res) => {
   res.json({ status: "success", message: "Welcome!" });
 });
 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
 // starting the server and keeping the connection open to listen for more requests
 module.exports = app.listen(3000);
 // app.listen(3000);
