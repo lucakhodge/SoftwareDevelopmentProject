@@ -42,7 +42,7 @@ db.connect()
 
 
 app.get("/", (req, res) => {
-  res.send("hello");
+  res.send("pages/home");
 });
 
 app.get("/upload", (req, res) => {
