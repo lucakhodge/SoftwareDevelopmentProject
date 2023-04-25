@@ -1,5 +1,6 @@
 <%- include ('../partials/head') %>
 <%- include ('../partials/menu') %>
+<script type="text/javascript" src="https://static.filestackapi.com/v3/filestack.js"></script>
 
 <main>
   <div class="container">
@@ -7,6 +8,23 @@
       <%- include  ('../partials/message') %>
 
         <div class="container">
+          <div class="box">
+            <form id="pick-form">
+              <div class="field">
+                <div class="control">
+                  <button class="button" type="button" id="picker">Pick file</button>
+                  <input type="hidden" id="fileupload">
+                </div>
+                <div class="control" id="nameBox"></div>
+                <div class="control" id="urlBox"></div>
+              </div>
+              <div class="field">
+                <div class="control">
+                  <input class="button" type="submit" value="Submit">
+                </div>
+              </div>
+            </form>
+          </div>  
           <div>
 
             </div>
@@ -16,13 +34,23 @@
             </style>
             <table border = "1">
             <tr>
-            <th >Upload Here</th>
+
             </tr>
             <thread>
             <tbody>
                 <tr>
                   <td>
-                    <a href="a">Choose file</a>
+                    <!-- <a href="a">Choose file</a> -->
+                    <!-- <script> 
+                    const client = filestack.init(API_KEY);
+                    client.picker().open();
+                    </script> -->
+                    
+                    <!-- <script src="//static.filestackapi.com/filestack-js/3.x.x/filestack.min.js"></script> -->
+                    <button>Upload Here</button>
+                  </td>
+                  <td>
+                    <div class="drop-container">Drag and Drop</div>
                   </td>
                   </tr>
             </tbody>
@@ -31,36 +59,6 @@
           </table>
         </div>
   </div>
-  <input
-    type="hidden"
-    role="uploadcare-uploader"
-    data-public-key="demopublickey"
-    data-tabs="file camera url facebook gdrive gphotos"
-/>
-
-<script>
-  UPLOADCARE_PUBLIC_KEY = "demopublickey"
-  UPLOADCARE_TABS = "file camera url facebook gdrive gphotos"
-</script>
-
-<input
-    type="hidden"
-    role="uploadcare-uploader"
-/>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-      uploadcare.Widget('[name="file"]', {
-          "publicKey": "demopublickey",
-          "tabs": "file camera url facebook gdrive gphotos"
-      })
-  });
-</script>
-
-<input
-    type="hidden"
-    name="file"
-/>
 
 </main>
 

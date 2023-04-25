@@ -10,7 +10,7 @@ const session = require("express-session"); // To set the session object. To sto
 const bcrypt = require("bcrypt"); //  To hash passwords
 const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part B.
 const read = require("body-parser/lib/read");
-const cloudinary = require("cloudinary").v2;
+const fetch = require("node-fetch");
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -37,41 +37,87 @@ db.connect()
     console.log("ERROR:", error.message || error);
   });
 
-//Cloudinary API:
 
-//configuration
-cloudinary.config({
-  cloud_name: "dfx20hhlk",
-  api_key: "676725369999912",
-  api_secret: "cISXL5XpemBW1clvfGWWUJe1mqg",
+
+//filestack:
+
+
+app.get("/", (req, res) => {
+  res.send("hello");
 });
 
-const res = cloudinary.uploader.upload(
-  "https://upload.wikimedia.org/wikipedia/commons/a/ae/Olympic_flag.jpg",
-  { public_id: "olympic_flag" }
-);
+app.get("/upload", (req, res) => {
+  res.render("pages/upload");
+});
 
-res
-  .then((data) => {
-    console.log(data);
-    console.log(data.secure_url);
-  })
-  .catch((err) => {
-    console.log(err);
+
+///pdf shows up as undefined through postman
+
+app.post("/upload", (req, res) => {
+  console.log(req.files);
+  fetch("https://www.filestackapi.com/api/store/S3?key=API_KEY", {
+    method:'POST',
+    header:{ "Content-Type": "image/png" },
+    body: req.files.data,
+  }
+  ).then((r)=>r.json())
+  .then((r)=>{
+    console.log(r);
+    res.json(r);
   });
+})
 
-// Generate
-const url = cloudinary.url("olympic_flag", {
-  width: 100,
-  height: 150,
-  Crop: "fill",
+
+
+/*
+
+const client = filestack.init(API_KEY);
+const options = {
+  onUploadDone: updateForm,
+  maxSize: 10 * 1024 * 1024,
+  accept: 'image/*',
+  uploadInBackground: false,
+};
+const picker = client.picker(options);
+
+// Get references to the DOM elements
+
+const form = document.getElementById('pick-form');
+const fileInput = document.getElementById('fileupload');
+const btn = document.getElementById('picker');
+const nameBox = document.getElementById('nameBox');
+const urlBox = document.getElementById('urlBox');
+
+// Add event listeners
+
+btn.addEventListener('click', function (e) {
+  e.preventDefault();
+  picker.open();
 });
 
-// The output url
-console.log(url);
-// https://res.cloudinary.com/<cloud_name>/image/upload/h_150,w_100/olympic_flag
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  alert('Submitting: ' + fileInput.value);
+});
 
-//Uploadcare:
+// Helper to overwrite the field input value
+
+function updateForm (result) {
+  const fileData = result.filesUploaded[0];
+  fileInput.value = fileData.url;
+  
+  // DOM code to show some data. 
+  const name = document.createTextNode('Selected: ' + fileData.filename);
+  const url = document.createElement('a');
+  url.href = fileData.url;
+  url.appendChild(document.createTextNode(fileData.url));
+  nameBox.appendChild(name);
+  urlBox.appendChild(document.createTextNode('Uploaded to: '));
+  urlBox.appendChild(url);
+};
+*/
+
+
 
 // import uploadcare from "uploadcare-widget/uploadcare.lang.en.min.js";
 
@@ -245,9 +291,7 @@ app.get("/search", (req, res) => {
 // 	});
 // });
 
-app.get("/upload", (req, res) => {
-  res.render("pages/upload");
-});
+
 
 app.get("/logout", (req, res) => {
   req.session.destroy();
