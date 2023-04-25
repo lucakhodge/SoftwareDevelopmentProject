@@ -5,7 +5,65 @@
   <div class="container">
     <!-- THE REST OF YOUR HTML CODE GOES HERE -->
       <%- include  ('../partials/message') %>
-        PROFILE PAGE HERE
+
+        <div class="card">
+          <h1>Profile</h1>
+          <div>Welcome <%= username %> </div>
+        </div>
+        
+
+        <div class='row'>
+          <div class = 'col'>
+            <div class="card">
+              <h3 >My uploads</h3>
+            <table class="table">
+                <thead>
+                
+                <tr>
+                    
+                    <th scope="col">Title</th>
+                    <th scope="col">Link</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                <% uploaded.forEach((item)=>{ %>
+                    <tr>
+                        <td ><%-item.title%></td>
+                        <td ><%-item.link%></td>
+                    </tr>
+                <% }); %>
+                </tbody>
+            </table></div>
+            
+          </div>
+          <div class = 'col'>
+            <div class = 'card'>
+              <h3>Liked</h3>
+            <table class="table">
+                  <thead>
+                  
+                  <tr>
+                      
+                      <th scope="col">Title</th>
+                      <th scope="col">Link</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  
+                  <% liked.forEach((item)=>{ %>
+                      <tr>
+                          <td ><%-item.title%></td>
+                          <td ><%-item.link%></td>
+                      </tr>
+                  <% }); %>
+                  </tbody>
+              </table></div>
+            
+          </div>
+        </div>
+
+        
   </div>
 </main>
 

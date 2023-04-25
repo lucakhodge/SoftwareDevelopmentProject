@@ -125,6 +125,7 @@ function updateForm (result) {
 
 app.set("view engine", "ejs"); // set the view engine to EJS
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
+app.use(express.static('images')) // allows the use of static files
 
 // initialize session variables
 app.use(
@@ -144,7 +145,9 @@ app.use(
 ///////   API ROUTES    //////////
 
 app.get("/", (req, res) => {
-  res.redirect("/login");
+  // res.redirect("/login");
+  res.render("pages/home");
+
 });
 
 app.get("/register", (req, res) => {
@@ -233,7 +236,28 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
-  res.render("pages/profile");
+  var username;
+  // if (isLoggedIn(req.session)) {
+  if (req.session.hasOwnProperty("user")) {
+    //case: logged in
+    username = req.session.user.username;
+  } else {
+    //case: not logged in
+    // username = "NOT LOGGED IN";
+    res.redirect("/login");
+  }
+  res.render("pages/profile", {
+    username: username,
+    uploaded: [
+      { title: "upload 1", link: "ul1" },
+      { title: "upload 2", link: "ul2" },
+      { title: "upload 3", link: "ul3" },
+    ],
+    liked: [
+      { title: "liked 1", link: "ll1" },
+      { title: "liked 2", link: "ll2" },
+    ],
+  });
 });
 
 app.get("/search", (req, res) => {
@@ -301,6 +325,10 @@ app.get("/logout", (req, res) => {
 
 app.get("/welcome", (req, res) => {
   res.json({ status: "success", message: "Welcome!" });
+});
+
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
 });
 
 // starting the server and keeping the connection open to listen for more requests
