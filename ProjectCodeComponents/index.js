@@ -101,7 +101,9 @@ app.use(
 ///////   API ROUTES    //////////
 
 app.get("/", (req, res) => {
-  res.redirect("/login");
+  // res.redirect("/login");
+  res.render("pages/home");
+
 });
 
 app.get("/register", (req, res) => {
