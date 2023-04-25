@@ -10,7 +10,6 @@ const session = require("express-session"); // To set the session object. To sto
 const bcrypt = require("bcrypt"); //  To hash passwords
 const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part B.
 const read = require("body-parser/lib/read");
-const fetch = require("node-fetch");
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -55,16 +54,15 @@ app.get("/upload", (req, res) => {
 
 app.post("/upload", (req, res) => {
   console.log(req.files);
-  fetch("https://www.filestackapi.com/api/store/S3?key=API_KEY", {
+  axios("https://www.filestackapi.com/api/store/S3?key=API_KEY", {
     method:'POST',
     header:{ "Content-Type": "image/png" },
     body: req.files.data,
   }
-  ).then((r)=>r.json())
-  .then((r)=>{
+  ).then((r)=>{
     console.log(r);
     res.json(r);
-  });
+  }).catch((e) => console.log(e));
 })
 
 

@@ -12,8 +12,8 @@
             <form id="pick-form">
               <div class="field">
                 <div class="control">
+                  <input type="file" id="fileupload" accept="image/*" name="fileupload">
                   <button class="button" type="button" id="picker">Pick file</button>
-                  <input type="hidden" id="fileupload">
                 </div>
                 <div class="control" id="nameBox"></div>
                 <div class="control" id="urlBox"></div>
@@ -28,38 +28,54 @@
           <div>
 
             </div>
-          <table width="100%">
-            <style>
-                table{border: 1px solid black;}
-            </style>
-            <table border = "1">
-            <tr>
-
-            </tr>
-            <thread>
-            <tbody>
-                <tr>
-                  <td>
-                    <!-- <a href="a">Choose file</a> -->
-                    <!-- <script> 
-                    const client = filestack.init(API_KEY);
-                    client.picker().open();
-                    </script> -->
-                    
-                    <!-- <script src="//static.filestackapi.com/filestack-js/3.x.x/filestack.min.js"></script> -->
-                    <button>Upload Here</button>
-                  </td>
-                  <td>
-                    <div class="drop-container">Drag and Drop</div>
-                  </td>
-                  </tr>
-            </tbody>
-            </thread>
-            
-          </table>
         </div>
   </div>
+  <script>
+    const client = filestack.init(API_KEY);
+    const options = {
+      onUploadDone: updateForm,
+      maxSize: 10 * 1024 * 1024,
+      accept: 'image/*',
+      uploadInBackground: false,
+    };
+    const picker = client.picker(options);
 
+    // Get references to the DOM elements
+
+    const form = document.getElementById('pick-form');
+    const fileInput = document.getElementById('fileupload');
+    const btn = document.getElementById('picker');
+    const nameBox = document.getElementById('nameBox');
+    const urlBox = document.getElementById('urlBox');
+
+    // Add event listeners
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      picker.open();
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      alert('Submitting: ' + fileInput.value);
+    });
+
+    // Helper to overwrite the field input value
+
+    function updateForm (result) {
+      const fileData = result.filesUploaded[0];
+      fileInput.value = fileData.url;
+      
+      // DOM code to show some data. 
+      const name = document.createTextNode('Selected: ' + fileData.filename);
+      const url = document.createElement('a');
+      url.href = fileData.url;
+      url.appendChild(document.createTextNode(fileData.url));
+      nameBox.appendChild(name);
+      urlBox.appendChild(document.createTextNode('Uploaded to: '));
+      urlBox.appendChild(url);
+    };
+  </script>
 </main>
 
 <%- include ('../partials/footer') %>
