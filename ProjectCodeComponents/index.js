@@ -36,36 +36,31 @@ db.connect()
     console.log("ERROR:", error.message || error);
   });
 
-
-
 //filestack:
 
-
 app.get("/", (req, res) => {
-  res.send("pages/home");
+  res.render("pages/home");
 });
 
 app.get("/upload", (req, res) => {
   res.render("pages/upload");
 });
 
-
 ///pdf shows up as undefined through postman
 
 app.post("/upload", (req, res) => {
   console.log(req.files);
   axios("https://www.filestackapi.com/api/store/S3?key=API_KEY", {
-    method:'POST',
-    header:{ "Content-Type": "image/png" },
+    method: "POST",
+    header: { "Content-Type": "image/png" },
     body: req.files.data,
-  }
-  ).then((r)=>{
-    console.log(r);
-    res.json(r);
-  }).catch((e) => console.log(e));
-})
-
-
+  })
+    .then((r) => {
+      console.log(r);
+      res.json(r);
+    })
+    .catch((e) => console.log(e));
+});
 
 /*
 
@@ -115,8 +110,6 @@ function updateForm (result) {
 };
 */
 
-
-
 // import uploadcare from "uploadcare-widget/uploadcare.lang.en.min.js";
 
 // *****************************************************
@@ -125,7 +118,7 @@ function updateForm (result) {
 
 app.set("view engine", "ejs"); // set the view engine to EJS
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
-app.use(express.static('images')) // allows the use of static files
+app.use(express.static("images")); // allows the use of static files
 
 // initialize session variables
 app.use(
@@ -147,7 +140,6 @@ app.use(
 app.get("/", (req, res) => {
   // res.redirect("/login");
   res.render("pages/home");
-
 });
 
 app.get("/register", (req, res) => {
@@ -313,8 +305,6 @@ app.get("/search", (req, res) => {
 // 	});
 // });
 
-
-
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.render("pages/login", {
@@ -327,8 +317,8 @@ app.get("/welcome", (req, res) => {
   res.json({ status: "success", message: "Welcome!" });
 });
 
-app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
+app.get("/welcome", (req, res) => {
+  res.json({ status: "success", message: "Welcome!" });
 });
 
 // starting the server and keeping the connection open to listen for more requests
