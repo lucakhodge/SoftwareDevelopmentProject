@@ -1,15 +1,19 @@
 // *****************************************************
 // <!-- Section 1 : Import Dependencies -->
 // *****************************************************
-
 const express = require("express"); // To build an application server or API
 const app = express();
+const upload = require('express-fileupload');
 const pgp = require("pg-promise")(); // To connect to the Postgres DB from the node server
 const bodyParser = require("body-parser");
 const session = require("express-session"); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require("bcrypt"); //  To hash passwords
 const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part B.
 const read = require("body-parser/lib/read");
+const { Blob } = require("buffer");
+const gcloud = require('gcloud');
+
+
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -24,7 +28,7 @@ const dbConfig = {
   password: process.env.POSTGRES_PASSWORD, // the password of the user account
 };
 
-const db = pgp(dbConfig);
+var db = pgp(dbConfig);
 
 // test your database
 db.connect()
@@ -38,12 +42,150 @@ db.connect()
 
 
 
+////////////////
+
+app.use(upload());
+
+/*
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '/uploads'))
+});
+*/
+
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./serviceAccountKeys.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+db = admin.firestore();
+
+
+///gcloud
+/*
+var storage = gcloud.storage({
+  projectId: 'metal-sorter-340922',
+  keyFilename: 'service-account-credentials.json'
+});
+
+storage.createBucket('octocats', function(err, bucket) {
+
+  // Error: 403, accountDisabled
+  // The account for the specified project has been disabled.
+
+  // Create a new blob in the bucket and upload the file data.
+  var blob = bucket.file("octofez.png");
+  var blobStream = blob.createWriteStream();
+
+  blobStream.on('error', function (err) {
+      console.error(err);
+  });
+
+  blobStream.on('finish', function () {
+      var publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+      console.log(publicUrl);
+  });
+
+  fs.createReadStream("octofez.png").pipe(blobStream);
+});
+
+*/
+
+
+var filename;
+var fileId;
+
+let fileStore = db.collection("uploads");
+
+
+//read the files in the database
+fileStore.get().then((querySnapshot) =>{
+  querySnapshot.forEach(document =>{
+    console.log(document.data());
+  })
+})
+
+//upload function that is supposed to send the file to the db
+app.post('/',(req,res) =>{
+  if(req.files){
+    console.log(req.files);
+    var file = req.files.file;
+    fileId = file.md5;
+    filename = file.name;
+    console.log(filename);
+    console.log(fileId);
+
+
+    const data = {
+      fileId: fileId,
+      filename: filename,
+    }
+
+
+    // Add a new document in collection
+    db.collection("uploads").doc(data.filename.toString()).set(data);
+    
+
+  }
+  
+})
+
+
+
+
+
+
+
+
+/*
+
+if(data != null)
+{
+  db.collection("uploads").doc(data.id.toString()).set({
+    fileId: fileId,
+    filename: filename
+  });
+}
+
+*/
+
+
+
+/////Read from the db
+/*
+let fileStore = db.collection("uploads");
+
+fileStore.get().then((querySnapshot) =>{
+  querySnapshot.forEach(document =>{
+    console.log(document.data());
+  })
+})
+
+*/
+
+
+/*
+Read a specific item from db:
+
+
+const docid = "insert sql command";
+db.collection("uploads").doc(docid);
+*/
+
+
+
+
+
+
 //filestack:
 
-
+/*
 app.get("/", (req, res) => {
   res.send("hello");
 });
+*/
 
 app.get("/upload", (req, res) => {
   res.render("pages/upload");
@@ -64,56 +206,6 @@ app.post("/upload", (req, res) => {
     res.json(r);
   }).catch((e) => console.log(e));
 })
-
-
-
-/*
-
-const client = filestack.init(API_KEY);
-const options = {
-  onUploadDone: updateForm,
-  maxSize: 10 * 1024 * 1024,
-  accept: 'image/*',
-  uploadInBackground: false,
-};
-const picker = client.picker(options);
-
-// Get references to the DOM elements
-
-const form = document.getElementById('pick-form');
-const fileInput = document.getElementById('fileupload');
-const btn = document.getElementById('picker');
-const nameBox = document.getElementById('nameBox');
-const urlBox = document.getElementById('urlBox');
-
-// Add event listeners
-
-btn.addEventListener('click', function (e) {
-  e.preventDefault();
-  picker.open();
-});
-
-form.addEventListener('submit', function (e) {
-  e.preventDefault();
-  alert('Submitting: ' + fileInput.value);
-});
-
-// Helper to overwrite the field input value
-
-function updateForm (result) {
-  const fileData = result.filesUploaded[0];
-  fileInput.value = fileData.url;
-  
-  // DOM code to show some data. 
-  const name = document.createTextNode('Selected: ' + fileData.filename);
-  const url = document.createElement('a');
-  url.href = fileData.url;
-  url.appendChild(document.createTextNode(fileData.url));
-  nameBox.appendChild(name);
-  urlBox.appendChild(document.createTextNode('Uploaded to: '));
-  urlBox.appendChild(url);
-};
-*/
 
 
 
