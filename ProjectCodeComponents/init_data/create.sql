@@ -8,9 +8,9 @@ DROP TABLE IF EXISTS StudyGuides CASCADE;
 CREATE TABLE StudyGuides(
     SG_id SERIAL PRIMARY KEY,
     name VARCHAR(50),
-    user_id INT,
+    username VARCHAR(50), /* Changed to username,  User_ID was a mistake. */
     likes INT, /* This is up for change,  We could implement a seperate table for this, in late dev this will be neccessary as someone could spam like on thier own post */
-    dataLink VARCHAR(50) /* Assuming that we will be hosting PDF's online using a API and a link to said data */
+    dataLink VARCHAR(250) /* Assuming that we will be hosting PDF's online using a API and a link to said data */
 );
 
 DROP TABLE IF EXISTS tags CASCADE;
