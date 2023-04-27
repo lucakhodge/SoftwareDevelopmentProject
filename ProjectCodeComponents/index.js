@@ -367,6 +367,82 @@ app.get("/logout", (req, res) => {
   });
 });
 
+
+app.post("/uploadFile", (req,res) => {
+	const {fileName, subject} = req.body;
+	const tags = req.body.tags;
+
+	var username;
+	// if (isLoggedIn(req.session)) {
+	if (req.session.hasOwnProperty("user")) {
+		//case: logged in
+		username = req.session.user.username;
+	} else {
+		console.log("Test1");
+		//message to tell them to login
+		res.status(400).render("pages/login", {
+			error: true,
+			message: "Please Log In",
+		});
+		
+	}
+
+
+	const tempImg = "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
+
+
+	const q = "INSERT INTO StudyGuides (name, username, likes, dataLink) VALUES ($1, $2, $3, $4) returning *;";
+
+
+	db.any(q,[fileName, username, '0', tempImg])
+		.then((data) => {
+			const SG_ID = data[0].sg_id;			
+			(async () => {
+
+				console.log("If test");
+				if(tags){
+				for (const tag of tags) {
+					console.log("Test4",tag,tags);
+					await db.none("INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) VALUES ($1, $2)", [SG_ID, tag])
+					.then(() => {
+						console.log("Tag inserted")
+					})
+					.catch(error => console.error(error));
+				}
+				console.log("All tags inserted");
+			}
+			else{console.log("No tags to insert")}
+			})();
+		})
+		.catch((err) => {
+			console.log( err);
+			res.status(400).render("pages/upload", {
+				error: true,
+				message: "Upload Failure",
+			});
+		});
+		db.any('SELECT * FROM StudyGuides_to_Tags')
+			.then(result => {
+				console.log('Data from StudyGuides_to_Tags:', result);
+			})
+			.catch(error => {
+				console.error(error);
+				res.send('Error retrieving SG data');
+			});
+
+		
+		db.any('SELECT * FROM StudyGuides')
+		.then(result => {
+			console.log('Data from StudyGuides:', result);
+			res.render('pages/upload');
+		})
+		.catch(error => {
+			console.error(error);
+			res.send('Error retrieving Tags data');
+		});
+});
+
+
 app.get("/welcome", (req, res) => {
   res.json({ status: "success", message: "Welcome!" });
 });
