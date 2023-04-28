@@ -6,23 +6,17 @@
   <div class="container">
     <!-- THE REST OF YOUR HTML CODE GOES HERE -->
       <%- include  ('../partials/message') %>
-      
-      <form action="/tempUploadFile" method="POST">
+
+      <form action="/uploadFile" method="POST">
+
         <div class="mb-3 form-group">
           <label for="fileName" class="form-label"> File Name: </label>
           <input type="text" id="fileName" name="fileName" class="form-control" />
         </div>
+
         <div class="mb-3 form-group">
           <label for="fileUrl" class="form-label"> File Link: </label>
           <input type="text" id="fileUrl" name="fileUrl" class="form-control" />
-        </div>
-        <input type="submit" value="Upload" class="btn btn-primary" style="margin-top: 0.5em" />
-      </form>
-
-      <form action="/uploadFile" method="POST">
-        <div class="mb-3 form-group">
-          <label for="fileName" class="form-label"> File Name: </label>
-          <input type="text" id="fileName" name="fileName" class="form-control" />
         </div>
   
         <div class="mb-3 form-group">
@@ -35,6 +29,7 @@
           </select>
         </div>
   
+
         <div class="mb-3 form-group">
           <label for="sort-by" class="form-label" style="margin-right: 1em"> Tags: </label>
           <div class="form-check form-check-inline">
@@ -72,7 +67,7 @@
       </form>
 
 
-
+<!-- 
         <div class="container">
           <div class="box">
             <form id="pick-form">
@@ -139,7 +134,7 @@
       urlBox.appendChild(document.createTextNode('Uploaded to: '));
       urlBox.appendChild(url);
     };
-  </script>
+  </script> -->
 </main>
 
 <%- include ('../partials/footer') %>
