@@ -235,21 +235,37 @@ app.get("/profile", (req, res) => {
     username = req.session.user.username;
   } else {
     //case: not logged in
-    // username = "NOT LOGGED IN";
     res.redirect("/login");
   }
-  res.render("pages/profile", {
-    username: username,
-    uploaded: [
-      { title: "upload 1", link: "ul1" },
-      { title: "upload 2", link: "ul2" },
-      { title: "upload 3", link: "ul3" },
-    ],
-    liked: [
-      { title: "liked 1", link: "ll1" },
-      { title: "liked 2", link: "ll2" },
-    ],
-  });
+  q =
+    "SELECT name AS title, username, likes, dataLink AS link FROM StudyGuides LIMIT 5;";
+  db.any(q, [])
+    .then((data) => {
+      // res.json(data);
+      res.render("pages/profile", {
+        username: username,
+        uploaded: data,
+        liked: [
+          { title: "liked 1", link: "ll1" },
+          { title: "liked 2", link: "ll2" },
+        ],
+      });
+    })
+    .catch((err) => {
+      res.render("pages/profile", {
+        username: username,
+        uploaded: [
+          { title: "upload 1", link: "ul1" },
+          { title: "upload 2", link: "ul2" },
+          { title: "upload 3", link: "ul3" },
+          { title: "i guess 4", link: "ul4" },
+        ],
+        liked: [
+          { title: "liked 1", link: "ll1" },
+          { title: "liked 2", link: "ll2" },
+        ],
+      });
+    });
 });
 
 app.get("/search", (req, res) => {
@@ -345,11 +361,11 @@ app.get("/display", (req, res) => {
   res.render("pages/display", req.query);
 });
 
-app.get("/displaytest", (req, res) => {
-  res.redirect(
-    "/display?title=Book Image&liked=5&url=https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimages.fineartamerica.com%2Fimages%2Fartworkimages%2Fmediumlarge%2F2%2Fold-books-in-library-shelf-luoman.jpg&f=1&nofb=1&ipt=7a103c7783084021ada777bf011494cfebd305db46c678d10ac2f64ab572f6fb&ipo=images"
-  );
-});
+// app.get("/displaytest", (req, res) => {
+//   res.redirect(
+//     "/display?title=Book Image&liked=5&url=https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimages.fineartamerica.com%2Fimages%2Fartworkimages%2Fmediumlarge%2F2%2Fold-books-in-library-shelf-luoman.jpg&f=1&nofb=1&ipt=7a103c7783084021ada777bf011494cfebd305db46c678d10ac2f64ab572f6fb&ipo=images"
+//   );
+// });
 
 app.post("/like", (req, res) => {
   res.redirect("/display");
@@ -367,81 +383,101 @@ app.get("/logout", (req, res) => {
   });
 });
 
-
-app.post("/uploadFile", (req,res) => {
-	const {fileName, subject} = req.body;
-	const tags = req.body.tags;
-
-	var username;
-	// if (isLoggedIn(req.session)) {
-	if (req.session.hasOwnProperty("user")) {
-		//case: logged in
-		username = req.session.user.username;
-	} else {
-		console.log("Test1");
-		//message to tell them to login
-		res.status(400).render("pages/login", {
-			error: true,
-			message: "Please Log In",
-		});
-		
-	}
-
-
-	const tempImg = "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
-
-
-	const q = "INSERT INTO StudyGuides (name, username, likes, dataLink) VALUES ($1, $2, $3, $4) returning *;";
-
-
-	db.any(q,[fileName, username, '0', tempImg])
-		.then((data) => {
-			const SG_ID = data[0].sg_id;			
-			(async () => {
-
-				console.log("If test");
-				if(tags){
-				for (const tag of tags) {
-					console.log("Test4",tag,tags);
-					await db.none("INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) VALUES ($1, $2)", [SG_ID, tag])
-					.then(() => {
-						console.log("Tag inserted")
-					})
-					.catch(error => console.error(error));
-				}
-				console.log("All tags inserted");
-			}
-			else{console.log("No tags to insert")}
-			})();
-		})
-		.catch((err) => {
-			console.log( err);
-			res.status(400).render("pages/upload", {
-				error: true,
-				message: "Upload Failure",
-			});
-		});
-		db.any('SELECT * FROM StudyGuides_to_Tags')
-			.then(result => {
-				console.log('Data from StudyGuides_to_Tags:', result);
-			})
-			.catch(error => {
-				console.error(error);
-				res.send('Error retrieving SG data');
-			});
-
-		
-		db.any('SELECT * FROM StudyGuides')
-		.then(result => {
-			console.log('Data from StudyGuides:', result);
-			res.render('pages/upload');
-		})
-		.catch(error => {
-			console.error(error);
-			res.send('Error retrieving Tags data');
-		});
+app.post("/tempUploadFile", (req, res) => {
+  if (req.session.hasOwnProperty("user")) {
+    username = req.session.user.username;
+    q =
+      "INSERT INTO StudyGuides (name, username, likes, dataLink) values ($1, $2, 0, $3) ;";
+    db.any(q, [req.body.fileName, username, req.body.fileUrl])
+      .then((data) => {
+        mes = req.body.fileName + username;
+        res.render("pages/upload", { message: "Uploaded Sucessfully!" + mes });
+      })
+      .catch((err) => {
+        res.render("pages/upload", {
+          error: true,
+          message: "Failed to upload.",
+        });
+      });
+  } else {
+    res.redirect("/login");
+  }
 });
 
+app.post("/uploadFile", (req, res) => {
+  const { fileName, subject } = req.body;
+  const tags = req.body.tags;
+
+  var username;
+  // if (isLoggedIn(req.session)) {
+  if (req.session.hasOwnProperty("user")) {
+    //case: logged in
+    username = req.session.user.username;
+  } else {
+    console.log("Test1");
+    //message to tell them to login
+    res.status(400).render("pages/login", {
+      error: true,
+      message: "Please Log In",
+    });
+  }
+
+  const tempImg =
+    "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
+
+  const q =
+    "INSERT INTO StudyGuides (name, username, likes, dataLink) VALUES ($1, $2, $3, $4) returning *;";
+
+  db.any(q, [fileName, username, "0", tempImg])
+    .then((data) => {
+      const SG_ID = data[0].sg_id;
+      (async () => {
+        console.log("If test");
+        if (tags) {
+          for (const tag of tags) {
+            console.log("Test4", tag, tags);
+            await db
+              .none(
+                "INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) VALUES ($1, $2)",
+                [SG_ID, tag]
+              )
+              .then(() => {
+                console.log("Tag inserted");
+              })
+              .catch((error) => console.error(error));
+          }
+          console.log("All tags inserted");
+        } else {
+          console.log("No tags to insert");
+        }
+      })();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).render("pages/upload", {
+        error: true,
+        message: "Upload Failure",
+      });
+    });
+  db.any("SELECT * FROM StudyGuides_to_Tags")
+    .then((result) => {
+      console.log("Data from StudyGuides_to_Tags:", result);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.send("Error retrieving SG data");
+    });
+
+  db.any("SELECT * FROM StudyGuides")
+    .then((result) => {
+      console.log("Data from StudyGuides:", result);
+      res.render("pages/upload");
+    })
+    .catch((error) => {
+      console.error(error);
+      res.send("Error retrieving Tags data");
+    });
+});
 
 app.get("/welcome", (req, res) => {
   res.json({ status: "success", message: "Welcome!" });
