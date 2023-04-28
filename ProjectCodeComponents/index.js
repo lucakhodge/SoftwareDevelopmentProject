@@ -405,8 +405,9 @@ app.post("/tempUploadFile", (req, res) => {
 });
 
 app.post("/uploadFile", (req, res) => {
-  const { fileName, subject } = req.body;
+  const { fileName, subject, fileURL} = req.body;
   const tags = req.body.tags;
+  console.log("req.body.fileUrl : ", req.body.fileUrl);
 
   var username;
   // if (isLoggedIn(req.session)) {
@@ -422,17 +423,16 @@ app.post("/uploadFile", (req, res) => {
     });
   }
 
-  const tempImg =
-    "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
+//   const tempImg =
+//     "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
 
   const q =
     "INSERT INTO StudyGuides (name, username, likes, dataLink) VALUES ($1, $2, $3, $4) returning *;";
 
-  db.any(q, [fileName, username, "0", tempImg])
+  db.any(q, [fileName, username, "0", req.body.fileUrl])
     .then((data) => {
       const SG_ID = data[0].sg_id;
       (async () => {
-        console.log("If test");
         if (tags) {
           for (const tag of tags) {
             console.log("Test4", tag, tags);
@@ -452,6 +452,9 @@ app.post("/uploadFile", (req, res) => {
         }
       })();
     })
+
+
+
     .catch((err) => {
       console.log(err);
       res.status(400).render("pages/upload", {
@@ -459,24 +462,26 @@ app.post("/uploadFile", (req, res) => {
         message: "Upload Failure",
       });
     });
-  db.any("SELECT * FROM StudyGuides_to_Tags")
-    .then((result) => {
-      console.log("Data from StudyGuides_to_Tags:", result);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.send("Error retrieving SG data");
-    });
 
-  db.any("SELECT * FROM StudyGuides")
-    .then((result) => {
-      console.log("Data from StudyGuides:", result);
-      res.render("pages/upload");
-    })
-    .catch((error) => {
-      console.error(error);
-      res.send("Error retrieving Tags data");
-    });
+	db.any("SELECT * FROM StudyGuides_to_Tags")
+		.then((result) => {
+		console.log("Data from StudyGuides_to_Tags:", result);
+		})
+		.catch((error) => {
+		console.error(error);
+		res.send("Error retrieving SG data");
+	});
+
+  	db.any("SELECT * FROM StudyGuides")
+		.then((result) => {
+		console.log("Data from StudyGuides:", result);
+		mes = req.body.fileName + username;
+        res.render("pages/upload", { message: "Uploaded Sucessfully!" + mes });
+		})
+		.catch((error) => {
+		console.error(error);
+		res.send("Error retrieving Tags data");
+	});
 });
 
 app.get("/welcome", (req, res) => {
