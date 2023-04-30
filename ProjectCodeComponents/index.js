@@ -237,34 +237,51 @@ app.get("/profile", (req, res) => {
     //case: not logged in
     res.redirect("/login");
   }
-  q =
-    "SELECT name AS title, username, likes, dataLink AS link FROM StudyGuides LIMIT 5;";
-  db.any(q, [])
-    .then((data) => {
+  qUploaded =
+    "SELECT name AS title, username, likes, dataLink AS link FROM StudyGuides WHERE username = $1 ;";
+  qLiked =
+    "SELECT StudyGuides.name AS title, StudyGuides.username, StudyGuides.likes, StudyGuides.dataLink AS link FROM StudyGuides INNER JOIN LikedStudyGuides_to_Users ON StudyGuides.SG_id = LikedStudyGuides_to_Users.SG_id WHERE LikedStudyGuides_to_Users.username = $1 ;";
+  db.any(qUploaded, [username])
+    .then((data1) => {
       // res.json(data);
-      res.render("pages/profile", {
-        username: username,
-        uploaded: data,
-        liked: [
-          { title: "liked 1", link: "ll1" },
-          { title: "liked 2", link: "ll2" },
-        ],
-      });
+      db.any(qLiked, [username])
+        .then((data2) => {
+          res.render("pages/profile", {
+            username: username,
+            uploaded: data1,
+            liked: data2,
+          });
+        })
+        .catch((err) => {
+          res.render("pages/profile", {
+            username: username,
+            uploaded: data1,
+            liked: [],
+            error: true,
+            message: "Failed retrieving liked." + err,
+          });
+        });
     })
     .catch((err) => {
-      res.render("pages/profile", {
-        username: username,
-        uploaded: [
-          { title: "upload 1", link: "ul1" },
-          { title: "upload 2", link: "ul2" },
-          { title: "upload 3", link: "ul3" },
-          { title: "i guess 4", link: "ul4" },
-        ],
-        liked: [
-          { title: "liked 1", link: "ll1" },
-          { title: "liked 2", link: "ll2" },
-        ],
-      });
+      db.any(qLike, [username])
+        .then((data2) => {
+          res.render("pages/profile", {
+            username: [],
+            uploaded: [],
+            liked: data2,
+            error: true,
+            message: "Failed retrieving uploaded.",
+          });
+        })
+        .catch((err) => {
+          res.render("pages/profile", {
+            username: username,
+            uploaded: [],
+            liked: [],
+            error: true,
+            message: "Failed retriving uploaded and liked.",
+          });
+        });
     });
 });
 
@@ -405,7 +422,7 @@ app.post("/tempUploadFile", (req, res) => {
 });
 
 app.post("/uploadFile", (req, res) => {
-  const { fileName, subject, fileURL} = req.body;
+  const { fileName, subject, fileURL } = req.body;
   const tags = req.body.tags;
   console.log("req.body.fileUrl : ", req.body.fileUrl);
 
@@ -423,8 +440,8 @@ app.post("/uploadFile", (req, res) => {
     });
   }
 
-//   const tempImg =
-//     "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
+  //   const tempImg =
+  //     "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
 
   const q =
     "INSERT INTO StudyGuides (name, username, likes, dataLink) VALUES ($1, $2, $3, $4) returning *;";
@@ -453,8 +470,6 @@ app.post("/uploadFile", (req, res) => {
       })();
     })
 
-
-
     .catch((err) => {
       console.log(err);
       res.status(400).render("pages/upload", {
@@ -463,25 +478,25 @@ app.post("/uploadFile", (req, res) => {
       });
     });
 
-	db.any("SELECT * FROM StudyGuides_to_Tags")
-		.then((result) => {
-		console.log("Data from StudyGuides_to_Tags:", result);
-		})
-		.catch((error) => {
-		console.error(error);
-		res.send("Error retrieving SG data");
-	});
+  db.any("SELECT * FROM StudyGuides_to_Tags")
+    .then((result) => {
+      console.log("Data from StudyGuides_to_Tags:", result);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.send("Error retrieving SG data");
+    });
 
-  	db.any("SELECT * FROM StudyGuides")
-		.then((result) => {
-		console.log("Data from StudyGuides:", result);
-		mes = req.body.fileName + username;
-        res.render("pages/upload", { message: "Uploaded Sucessfully!" + mes });
-		})
-		.catch((error) => {
-		console.error(error);
-		res.send("Error retrieving Tags data");
-	});
+  db.any("SELECT * FROM StudyGuides")
+    .then((result) => {
+      console.log("Data from StudyGuides:", result);
+      mes = req.body.fileName + username;
+      res.render("pages/upload", { message: "Uploaded Sucessfully!" + mes });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.send("Error retrieving Tags data");
+    });
 });
 
 app.get("/welcome", (req, res) => {
