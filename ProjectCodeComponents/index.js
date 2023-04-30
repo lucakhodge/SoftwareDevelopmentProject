@@ -17,49 +17,49 @@ const read = require("body-parser/lib/read");
 
 // database configuration
 const dbConfig = {
-  host: "db", // the database server
-  port: 5432, // the database port
-  database: process.env.POSTGRES_DB, // the database name
-  user: process.env.POSTGRES_USER, // the user account to connect with
-  password: process.env.POSTGRES_PASSWORD, // the password of the user account
+	host: "db", // the database server
+	port: 5432, // the database port
+	database: process.env.POSTGRES_DB, // the database name
+	user: process.env.POSTGRES_USER, // the user account to connect with
+	password: process.env.POSTGRES_PASSWORD, // the password of the user account
 };
 
 const db = pgp(dbConfig);
 
 // test your database
 db.connect()
-  .then((obj) => {
-    console.log("Database connection successful"); // you can view this message in the docker compose logs
-    obj.done(); // success, release the connection;
-  })
-  .catch((error) => {
-    console.log("ERROR:", error.message || error);
-  });
+	.then((obj) => {
+		console.log("Database connection successful"); // you can view this message in the docker compose logs
+		obj.done(); // success, release the connection;
+	})
+	.catch((error) => {
+		console.log("ERROR:", error.message || error);
+	});
 
 //filestack:
 
 app.get("/", (req, res) => {
-  res.render("pages/home");
+	res.render("pages/home");
 });
 
 app.get("/upload", (req, res) => {
-  res.render("pages/upload");
+	res.render("pages/upload");
 });
 
 ///pdf shows up as undefined through postman
 
 app.post("/upload", (req, res) => {
-  console.log(req.files);
-  axios("https://www.filestackapi.com/api/store/S3?key=API_KEY", {
-    method: "POST",
-    header: { "Content-Type": "image/png" },
-    body: req.files.data,
-  })
-    .then((r) => {
-      console.log(r);
-      res.json(r);
-    })
-    .catch((e) => console.log(e));
+	console.log(req.files);
+	axios("https://www.filestackapi.com/api/store/S3?key=API_KEY", {
+		method: "POST",
+		header: { "Content-Type": "image/png" },
+		body: req.files.data,
+	})
+		.then((r) => {
+			console.log(r);
+			res.json(r);
+		})
+		.catch((e) => console.log(e));
 });
 
 /*
@@ -122,243 +122,319 @@ app.use(express.static("images")); // allows the use of static files
 
 // initialize session variables
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
-  })
+	session({
+		secret: process.env.SESSION_SECRET,
+		saveUninitialized: false,
+		resave: false,
+	})
 );
 
 app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
+	bodyParser.urlencoded({
+		extended: true,
+	})
 );
 
 ///////   API ROUTES    //////////
 
 app.get("/", (req, res) => {
-  // res.redirect("/login");
-  res.render("pages/home");
+	// res.redirect("/login");
+	res.render("pages/home");
 });
 
 app.get("/register", (req, res) => {
-  res.render("pages/register");
+	res.render("pages/register");
 });
 
 // Register
 app.post("/register", async (req, res) => {
-  //hash the password using bcrypt library
-  const hash = await bcrypt.hash(req.body.password, 10);
-  //   res.redirect("/login");
-  //   res.send(console.log("HERE"));
-  //   res.send(req.body.password);
+	//hash the password using bcrypt library
+	const hash = await bcrypt.hash(req.body.password, 10);
+	//   res.redirect("/login");
+	//   res.send(console.log("HERE"));
+	//   res.send(req.body.password);
 
-  const q = "INSERT INTO users VALUES ($1, $2) returning *;";
-  //   const q = "SELECT * FROM users;";
-  // To-DO: Insert username and hashed password into 'users' table
-  db.any(q, [req.body.username, hash])
-    .then((data) => {
-      res.redirect("/login");
-    })
-    .catch((err) => {
-      // console.log("MY ERROR", err);
-      res.status(400).render("pages/register", {
-        error: true,
-        message: "Could not add username and password into database.",
-      });
-    });
+	const q = "INSERT INTO users VALUES ($1, $2) returning *;";
+	//   const q = "SELECT * FROM users;";
+	// To-DO: Insert username and hashed password into 'users' table
+	db.any(q, [req.body.username, hash])
+		.then((data) => {
+			res.redirect("/login");
+		})
+		.catch((err) => {
+			// console.log("MY ERROR", err);
+			res.status(400).render("pages/register", {
+				error: true,
+				message: "Could not add username and password into database.",
+			});
+		});
 });
 
 app.get("/login", (req, res) => {
-  res.render("pages/login");
+	res.render("pages/login");
 });
 
 app.post("/login", async (req, res) => {
-  const q = "SELECT * FROM users WHERE username = $1;";
-  db.any(q, [req.body.username])
-    .then(async (data) => {
-      if (data.length === 0) {
-        //if username not found
-        // res.status(400).render("pages/login", {
-        //   error: true,
-        //   message: "Username does not exist",
-        // });
-        // res.status(400).json({
-        //   error: true,
-        //   message: "Username does not exist",
-        // });
-        // .render("pages/login");
+	const q = "SELECT * FROM users WHERE username = $1;";
+	db.any(q, [req.body.username])
+		.then(async (data) => {
+			if (data.length === 0) {
+				//if username not found
+				// res.status(400).render("pages/login", {
+				//   error: true,
+				//   message: "Username does not exist",
+				// });
+				// res.status(400).json({
+				//   error: true,
+				//   message: "Username does not exist",
+				// });
+				// .render("pages/login");
 
-        res.status(400).render("pages/login", {
-          error: true,
-          message: "Username does not exist",
-        });
-      } else {
-        let user = data[0];
-        const match = await bcrypt.compare(req.body.password, user.password);
-        if (match) {
-          //if password matches
-          req.session.user = user;
-          req.session.save();
-          res.status(200).redirect("/profile");
-          // res.status(200).json({ status: "200", message: "Success" });
-          // res.status(200).json({ message: "Success" }).redirect("/home");
-        } else {
-          //if password does not match
-          res.status(400).render("pages/login", {
-            error: true,
-            message: "Username and password do not match.",
-          });
-        }
-      }
-    })
-    .catch((err) => {
-      //db query failed
-      res.status(400).render("pages/login", {
-        error: true,
-        message: "Database query failed.",
-      });
-    });
+				res.status(400).render("pages/login", {
+					error: true,
+					message: "Username does not exist",
+				});
+			} else {
+				let user = data[0];
+				const match = await bcrypt.compare(req.body.password, user.password);
+				if (match) {
+					//if password matches
+					req.session.user = user;
+					req.session.save();
+					res.status(200).redirect("/profile");
+					// res.status(200).json({ status: "200", message: "Success" });
+					// res.status(200).json({ message: "Success" }).redirect("/home");
+				} else {
+					//if password does not match
+					res.status(400).render("pages/login", {
+						error: true,
+						message: "Username and password do not match.",
+					});
+				}
+			}
+		})
+		.catch((err) => {
+			//db query failed
+			res.status(400).render("pages/login", {
+				error: true,
+				message: "Database query failed.",
+			});
+		});
 
-  // res.status(400).json({
-  //   error: true,
-  //   message: "Username does not exist",
-  // });
+	// res.status(400).json({
+	//   error: true,
+	//   message: "Username does not exist",
+	// });
 });
 
 app.get("/profile", (req, res) => {
-  var username;
-  // if (isLoggedIn(req.session)) {
-  if (req.session.hasOwnProperty("user")) {
-    //case: logged in
-    username = req.session.user.username;
-  } else {
-    //case: not logged in
-    res.redirect("/login");
-  }
-  q =
-    "SELECT name AS title, username, likes, dataLink AS link FROM StudyGuides LIMIT 5;";
-  db.any(q, [])
-    .then((data) => {
-      // res.json(data);
-      res.render("pages/profile", {
-        username: username,
-        uploaded: data,
-        liked: [
-          { title: "liked 1", link: "ll1" },
-          { title: "liked 2", link: "ll2" },
-        ],
-      });
-    })
-    .catch((err) => {
-      res.render("pages/profile", {
-        username: username,
-        uploaded: [
-          { title: "upload 1", link: "ul1" },
-          { title: "upload 2", link: "ul2" },
-          { title: "upload 3", link: "ul3" },
-          { title: "i guess 4", link: "ul4" },
-        ],
-        liked: [
-          { title: "liked 1", link: "ll1" },
-          { title: "liked 2", link: "ll2" },
-        ],
-      });
-    });
+	var username;
+	// if (isLoggedIn(req.session)) {
+	if (req.session.hasOwnProperty("user")) {
+		//case: logged in
+		username = req.session.user.username;
+	} else {
+		//case: not logged in
+		res.redirect("/login");
+	}
+	q = "SELECT name AS title, username, likes, dataLink AS link FROM StudyGuides LIMIT 5;";
+	db.any(q, [])
+		.then((data) => {
+			// res.json(data);
+			res.render("pages/profile", {
+				username: username,
+				uploaded: data,
+				liked: [
+					{ title: "liked 1", link: "ll1" },
+					{ title: "liked 2", link: "ll2" },
+				],
+			});
+		})
+		.catch((err) => {
+			res.render("pages/profile", {
+				username: username,
+				uploaded: [
+					{ title: "upload 1", link: "ul1" },
+					{ title: "upload 2", link: "ul2" },
+					{ title: "upload 3", link: "ul3" },
+					{ title: "i guess 4", link: "ul4" },
+				],
+				liked: [
+					{ title: "liked 1", link: "ll1" },
+					{ title: "liked 2", link: "ll2" },
+				],
+			});
+		});
 });
 
 app.get("/search", (req, res) => {
-  res.render("pages/search");
+	res.render("pages/search", { documents: [] });
 });
 
 app.get("/searchResults", (req, res) => {
-  console.log(req.body, req.query);
-  // SEARCH FORM RETURNS:
-  // { }
-  // {
-  //     fileName: 'answers', -> StudyGuides name
-  //     subject: 'engineering', -> ?
-  //     lectureNotes: 'true', -> tags
-  //     articles: 'true', -> tags
-  //     nothing is returned for a checkbox that is not checked
-  //     sortBy: 'ascending'
-  // }
+	console.log(req.query);
+	// SEARCH FORM RETURNS:
+	// {
+	//     fileName: 'algo',
+	//     subject: 'Engineering & Applied Science',
+	//     lectureNotes: 'Lecture Notes',
+	//     articles: 'Articles',
+	//         -> Nothing is returned when a checkbox is not checked
+	//     sortBy: 'ascending'
+	// }
 
-  // VARIABLES
-  // req.query.fileName
-  // req.query.subject
-  // req.query.lectureNotes
-  // req.query.articles
-  // req.query.practiceTests
-  // req.query.sortBy
+	// VARIABLES
+	// req.query.fileName
+	// req.query.subject
+	// req.query.lectureNotes
+	// req.query.articles
+	// req.query.practiceTests
+	// req.query.sortBy
 
-  // QUERY
-  var drop = "DROP VIEW IF EXISTS guideSearch;";
-  var link =
-    "CREATE VIEW guideSearch AS SELECT StudyGuides.name AS DocumentName, StudyGuides.likes AS DocumentRating, StudyGuides.datalink AS DocumentLink, tags.tag_name AS Tags FROM StudyGuides_to_Tags INNER JOIN StudyGuides ON StudyGuides_to_Tags.SG_id = StudyGuides.SG_id INNER JOIN tags ON StudyGuides_to_Tags.tag_id = tags.tag_id;";
-  var find = "SELECT * FROM studyGuides WHERE (";
+	// QUERY
+	var dropUnfiltered = "DROP VIEW IF EXISTS resultsUnfiltered;";
+	var createUnfiltered =
+		"CREATE VIEW resultsUnfiltered AS SELECT " +
+		"StudyGuides.SG_id AS documentID, " +
+		"StudyGuides.name AS documentName, " +
+		"StudyGuides.likes AS documentRating, " +
+		"StudyGuides.datalink AS documentLink, " +
+		"subjects.sub_name AS documentSubject, " +
+		"tags.tag_name AS documentTag " +
+		"FROM StudyGuides " +
+		"INNER JOIN StudyGuides_to_Tags " +
+		"ON StudyGuides_to_Tags.SG_id = StudyGuides.SG_id " +
+		"INNER JOIN tags " +
+		"ON StudyGuides_to_Tags.tag_id = tags.tag_id " +
+		"INNER JOIN StudyGuides_to_Subjects " +
+		"ON StudyGuides_to_Subjects.SG_id = StudyGuides.SG_id " +
+		"INNER JOIN subjects " +
+		"ON StudyGuides_to_Subjects.sub_id = subjects.sub_id;";
 
-  // append appropriate values to query
-  if (req.query.fileName != null) {
-    find = find.concat(`DocumentName = '${req.query.fileName}' AND `);
-  }
+	// var display = "SELECT * FROM documentSearch;";
+	//  documentid | documentname | documentrating | documentlink |        documentsubject        |  documenttag
+	// ------------+--------------+----------------+--------------+-------------------------------+----------------
+	//           1 | Algorithms   |             10 | PDF          | Engineering & Applied Science | Lecture Notes
+	//           1 | Algorithms   |             10 | PDF          | Engineering & Applied Science | Articles
+	//           1 | Algorithms   |             10 | PDF          | Engineering & Applied Science | Practice Tests
+	//           2 | Economics    |              3 | PNG          | Business                      | Articles
+	//           2 | Economics    |              3 | PNG          | Business                      | Practice Tests
+	//           3 | Mythology    |              7 | PSD          | Arts & Sciences               | Lecture Notes
 
-  if (req.query.subject != null) {
-    find = find.concat(`DocumentSubject = '${req.query.subject}' AND `);
-  }
+	var dropCombined = "DROP VIEW IF EXISTS resultsCombined;";
+	var createCombined =
+		"CREATE VIEW resultsCombined AS SELECT " +
+		"documentID, documentName, documentRating, documentLink, documentSubject, " +
+		"STRING_AGG(documentTag, ', ') AS documentTags " +
+		"FROM documentSearch " +
+		"GROUP BY documentID, documentName, documentRating, documentLink, documentSubject;";
 
-  if (req.query.lectureNotes != null) {
-    find = find.concat(`Tags = '${req.query.lectureNotes}' AND `);
-  }
+	//  documentid | documentname | documentrating | documentlink |        documentsubject        |              documenttags
+	// ------------+--------------+----------------+--------------+-------------------------------+-----------------------------------------
+	//           1 | Algorithms   |             10 | PDF          | Engineering & Applied Science | Lecture Notes, Articles, Practice Tests
+	//           2 | Economics    |              3 | PNG          | Business                      | Articles, Practice Tests
+	//           3 | Mythology    |              7 | PSD          | Arts & Sciences               | Lecture Notes
 
-  if (req.query.articles != null) {
-    find = find.concat(`Tags = '${req.query.articles}' AND `);
-  }
+	var find = "SELECT * FROM resultsCombined WHERE (";
 
-  if (req.query.practiceTests != null) {
-    find = find.concat(`Tags = '${req.query.practiceTests}' AND `);
-  }
+	// append appropriate values to query
+	if (req.query.fileName != "") {
+		find = find.concat(`LOWER(documentName) LIKE LOWER('%${req.query.fileName}%') AND `);
+	}
 
-  // remove last instance of AND
-  var last = find.lastIndexOf("AND");
-  find = find.slice(0, last - 1);
+	if (req.query.subject != "select") {
+		find = find.concat(`documentSubject = '${req.query.subject}' AND `);
+	}
 
-  if (req.query.sortBy == "recent") {
-    find = find.concat(");");
-  }
+	if (
+		req.query.lectureNotes != null ||
+		req.query.articles != null ||
+		req.query.practiceTests != null
+	) {
+		find = find.concat(" (");
 
-  // sort query depending on input
-  if (req.query.sortBy == "descending") {
-    find = find.concat(`) SORT BY DocumentRating DESC;`);
-  }
+		if (req.query.lectureNotes != null) {
+			find = find.concat(`documentTags LIKE '%${req.query.lectureNotes}%' OR `);
+		}
 
-  if (req.query.sortBy == "ascending") {
-    find = find.concat(`) SORT BY DocumentRating ASC;`);
-  }
+		if (req.query.articles != null) {
+			find = find.concat(`documentTags LIKE '%${req.query.articles}%' OR `);
+		}
 
-  db.task("get-everything", (task) => {
-    return task.batch([task.any(drop), task.any(link), task.any(find)]);
-  })
-    .then((documents) => {
-      // display search results if the docker containers are running
-      console.log(documents);
-      // render the search page and send the data
-      res.render("pages/search", { documents: documents });
-    })
-    .catch((error) => {
-      // handle errors
-      res.render("pages/search", { documents: [], message: error });
-      return console.log(err);
-    });
+		if (req.query.practiceTests != null) {
+			find = find.concat(`documentTags LIKE '%${req.query.practiceTests}%' OR `);
+		}
+
+		// remove last instance of OR
+		var lastOr = find.lastIndexOf("OR");
+		find = find.slice(0, lastOr - 1);
+		find = find.concat(")");
+	} else {
+		// remove last instance of AND
+		var lastAnd = find.lastIndexOf("AND");
+		find = find.slice(0, lastAnd - 1);
+	}
+
+	if (req.query.sortBy == "recent") {
+		find = find.concat(");");
+	}
+
+	// sort query depending on input
+	if (req.query.sortBy == "descending") {
+		find = find.concat(`) ORDER BY documentRating DESC;`);
+	}
+
+	if (req.query.sortBy == "ascending") {
+		find = find.concat(`) ORDER BY documentRating ASC;`);
+	}
+
+	console.log(find);
+
+	// SELECT * FROM resultsCombined
+	//     WHERE (LOWER(documentName) LIKE LOWER('%algo%')
+	//         AND documentSubject = 'Engineering & Applied Science'
+	//         AND(documentTags LIKE '%Lecture Notes%'
+	//             OR DocumentTag LIKE '%Articles%'))
+	// ORDER BY DocumentRating ASC;
+
+	db.task("get-everything", (task) => {
+		task.batch([
+			task.any(dropUnfiltered),
+			task.any(createUnfiltered),
+			task.any(dropCombined),
+			task.any(createCombined),
+		]);
+		return task.any(find);
+	})
+		.then((documents) => {
+			console.log(documents);
+			// [
+			//   {
+			//     documentid: 1,
+			//     documentname: 'Algorithms',
+			//     documentrating: 10,
+			//     documentlink: 'PDF',
+			//     documentsubject: 'Engineering & Applied Science',
+			//     documenttags: 'Lecture Notes, Articles, Practice Tests'
+			//   }
+			// ]
+
+			// render the search page and send the data
+			res.render("pages/search", { documents: documents });
+		})
+		.catch((error) => {
+			// handle errors
+			res.render("pages/search", { documents: [], message: error });
+			return console.log(error);
+		});
 });
 
 app.get("/upload", (req, res) => {
-  res.render("pages/upload");
+	res.render("pages/upload");
 });
 
 app.get("/display", (req, res) => {
-  res.render("pages/display", req.query);
+	res.render("pages/display", req.query);
 });
 
 // app.get("/displaytest", (req, res) => {
@@ -368,7 +444,7 @@ app.get("/display", (req, res) => {
 // });
 
 app.post("/like", (req, res) => {
-  res.redirect("/display");
+	res.redirect("/display");
 });
 
 // app.post("/display", (req, res) => {
@@ -376,116 +452,113 @@ app.post("/like", (req, res) => {
 // });
 
 app.get("/logout", (req, res) => {
-  req.session.destroy();
-  res.render("pages/login", {
-    error: false,
-    message: "Logged out sucessfully",
-  });
+	req.session.destroy();
+	res.render("pages/login", {
+		error: false,
+		message: "Logged out sucessfully",
+	});
 });
 
 app.post("/tempUploadFile", (req, res) => {
-  if (req.session.hasOwnProperty("user")) {
-    username = req.session.user.username;
-    q =
-      "INSERT INTO StudyGuides (name, username, likes, dataLink) values ($1, $2, 0, $3) ;";
-    db.any(q, [req.body.fileName, username, req.body.fileUrl])
-      .then((data) => {
-        mes = req.body.fileName + username;
-        res.render("pages/upload", { message: "Uploaded Sucessfully!" + mes });
-      })
-      .catch((err) => {
-        res.render("pages/upload", {
-          error: true,
-          message: "Failed to upload.",
-        });
-      });
-  } else {
-    res.redirect("/login");
-  }
+	if (req.session.hasOwnProperty("user")) {
+		username = req.session.user.username;
+		q = "INSERT INTO StudyGuides (name, username, likes, dataLink) values ($1, $2, 0, $3) ;";
+		db.any(q, [req.body.fileName, username, req.body.fileUrl])
+			.then((data) => {
+				mes = req.body.fileName + username;
+				res.render("pages/upload", { message: "Uploaded Sucessfully!" + mes });
+			})
+			.catch((err) => {
+				res.render("pages/upload", {
+					error: true,
+					message: "Failed to upload.",
+				});
+			});
+	} else {
+		res.redirect("/login");
+	}
 });
 
 app.post("/uploadFile", (req, res) => {
-  const { fileName, subject, fileURL} = req.body;
-  const tags = req.body.tags;
-  console.log("req.body.fileUrl : ", req.body.fileUrl);
+	const { fileName, subject, fileURL } = req.body;
+	const tags = req.body.tags;
+	console.log("req.body.fileUrl : ", req.body.fileUrl);
 
-  var username;
-  // if (isLoggedIn(req.session)) {
-  if (req.session.hasOwnProperty("user")) {
-    //case: logged in
-    username = req.session.user.username;
-  } else {
-    console.log("Test1");
-    //message to tell them to login
-    res.status(400).render("pages/login", {
-      error: true,
-      message: "Please Log In",
-    });
-  }
+	var username;
+	// if (isLoggedIn(req.session)) {
+	if (req.session.hasOwnProperty("user")) {
+		//case: logged in
+		username = req.session.user.username;
+	} else {
+		console.log("Test1");
+		//message to tell them to login
+		res.status(400).render("pages/login", {
+			error: true,
+			message: "Please Log In",
+		});
+	}
 
-//   const tempImg =
-//     "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
+	//   const tempImg =
+	//     "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
 
-  const q =
-    "INSERT INTO StudyGuides (name, username, likes, dataLink) VALUES ($1, $2, $3, $4) returning *;";
+	const q =
+		"INSERT INTO StudyGuides (name, username, likes, dataLink) VALUES ($1, $2, $3, $4) returning *;";
 
-  db.any(q, [fileName, username, "0", req.body.fileUrl])
-    .then((data) => {
-      const SG_ID = data[0].sg_id;
-      (async () => {
-        if (tags) {
-          for (const tag of tags) {
-            console.log("Test4", tag, tags);
-            await db
-              .none(
-                "INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) VALUES ($1, $2)",
-                [SG_ID, tag]
-              )
-              .then(() => {
-                console.log("Tag inserted");
-              })
-              .catch((error) => console.error(error));
-          }
-          console.log("All tags inserted");
-        } else {
-          console.log("No tags to insert");
-        }
-      })();
-    })
+	db.any(q, [fileName, username, "0", req.body.fileUrl])
+		.then((data) => {
+			const SG_ID = data[0].sg_id;
+			(async () => {
+				if (tags) {
+					for (const tag of tags) {
+						console.log("Test4", tag, tags);
+						await db
+							.none(
+								"INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) VALUES ($1, $2)",
+								[SG_ID, tag]
+							)
+							.then(() => {
+								console.log("Tag inserted");
+							})
+							.catch((error) => console.error(error));
+					}
+					console.log("All tags inserted");
+				} else {
+					console.log("No tags to insert");
+				}
+			})();
+		})
 
-
-
-    .catch((err) => {
-      console.log(err);
-      res.status(400).render("pages/upload", {
-        error: true,
-        message: "Upload Failure",
-      });
-    });
+		.catch((err) => {
+			console.log(err);
+			res.status(400).render("pages/upload", {
+				error: true,
+				message: "Upload Failure",
+			});
+		});
 
 	db.any("SELECT * FROM StudyGuides_to_Tags")
 		.then((result) => {
-		console.log("Data from StudyGuides_to_Tags:", result);
+			console.log("Data from StudyGuides_to_Tags:", result);
 		})
 		.catch((error) => {
-		console.error(error);
-		res.send("Error retrieving SG data");
-	});
+			console.error(error);
+			res.send("Error retrieving SG data");
+		});
 
-  	db.any("SELECT * FROM StudyGuides")
+	db.any("SELECT * FROM StudyGuides")
 		.then((result) => {
-		console.log("Data from StudyGuides:", result);
-		mes = req.body.fileName + username;
-        res.render("pages/upload", { message: "Uploaded Sucessfully!" + mes });
+			console.log("Data from StudyGuides:", result);
+			mes = req.body.fileName + username;
+			res.render("pages/upload", { message: "Uploaded Sucessfully!" + mes });
 		})
 		.catch((error) => {
-		console.error(error);
-		res.send("Error retrieving Tags data");
-	});
+			console.error(error);
+			res.send("Error retrieving Tags data");
+		});
 });
 
 app.get("/welcome", (req, res) => {
-  res.json({ status: "success", message: "Welcome!" });
+	res.json({ status: "success", message: "Welcome!" });
 });
 
 // starting the server and keeping the connection open to listen for more requests

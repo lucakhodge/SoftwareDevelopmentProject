@@ -1,4 +1,5 @@
-<%- include ('../partials/head') %> <%- include ('../partials/menu') %>
+<%- include ('../partials/head') %> 
+<%- include ('../partials/menu') %>
 
 <main>
 	<div class="container" style="margin-top: 1em">
@@ -14,10 +15,11 @@
 			<div class="mb-3 form-group">
 				<label for="subject" class="form-label"> Subject: </label>
 				<select class="form-select" id="subject" name="subject">
-					<option value="arts">Arts & Sciences</option>
-					<option value="business">Business</option>
-					<option value="engineering">Engineering & Applied Science</option>
-					<option value="communication">Communication</option>
+                    <option value="select">Select a Subject</option>
+					<option value="Arts & Sciences">Arts & Sciences</option>
+					<option value="Business">Business</option>
+					<option value="Engineering & Applied Science">Engineering & Applied Science</option>
+					<option value="Communication">Communication</option>
 				</select>
 			</div>
 
@@ -27,7 +29,7 @@
 					<input
 						class="form-check-input"
 						type="checkbox"
-						value="true"
+						value="Lecture Notes"
 						id="lectureNotes"
 						name="lectureNotes" />
 					<label class="form-check-label" for="lectureNotes"> Lecture Notes </label>
@@ -36,7 +38,7 @@
 					<input
 						class="form-check-input"
 						type="checkbox"
-						value="true"
+						value="Articles"
 						id="articles"
 						name="articles" />
 					<label class="form-check-label" for="articles"> Articles </label>
@@ -45,7 +47,7 @@
 					<input
 						class="form-check-input"
 						type="checkbox"
-						value="true"
+						value="Practice Tests"
 						id="practiceTests"
 						name="practiceTests" />
 					<label class="form-check-label" for="practiceTests"> Practice Tests </label>
@@ -67,9 +69,9 @@
 
 	<hr style="margin: 2rem 5rem 1rem 5rem" />
 
-	<div class="container" style="margin-top: 2em">
+	<div class="container" style="margin: 2em auto 3em auto">
 		<h3>Results</h3>
-		<table style="width: 100%" ;>
+		<table style="width: 100%; border-collapse: separate; border-spacing: 0 .5em;" >
 			<tr>
 				<th>Name</th>
 				<th>Rating</th>
@@ -77,6 +79,18 @@
 				<th>Tags</th>
 				<th>Document Page</th>
 			</tr>
+
+            <% if (documents) 
+                { %> <% documents.forEach((documents) => { %>
+			        <tr>
+				        <td> <%-documents.documentname %> </td>
+                        <td> <%-documents.documentrating %> </td>
+                        <td> <%-documents.documentsubject %> </td>
+                        <td> <%-documents.documenttags %> </td>
+				        <td><a class="btn btn-primary" href="<%-documents.documentlink %>">Open</a></td>
+                    </tr>
+			    <% }); %> 
+            <% } %>
 		</table>
 	</div>
 </main>

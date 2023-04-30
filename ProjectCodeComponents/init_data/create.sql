@@ -13,6 +13,10 @@ CREATE TABLE StudyGuides(
     dataLink VARCHAR(250) /* Assuming that we will be hosting PDF's online using a API and a link to said data */
 );
 
+INSERT INTO StudyGuides (name, username, likes, dataLink) values ('Algorithms', 'Aidan', 10, 'PDF');
+INSERT INTO StudyGuides (name, username, likes, dataLink) values ('Economics', 'Luca', 3, 'PNG');
+INSERT INTO StudyGuides (name, username, likes, dataLink) values ('Mythology', 'Quinn', 7, 'PSD');
+
 DROP TABLE IF EXISTS tags CASCADE;
 CREATE TABLE tags(
     tag_id SERIAL PRIMARY KEY,
@@ -20,7 +24,7 @@ CREATE TABLE tags(
 );
 
 INSERT INTO tags (tag_id, tag_name) values (1, 'Lecture Notes');
-INSERT INTO tags (tag_id, tag_name) values (2, 'Article');
+INSERT INTO tags (tag_id, tag_name) values (2, 'Articles');
 INSERT INTO tags (tag_id, tag_name) values (3, 'Practice Tests');
 
 DROP TABLE IF EXISTS subjects CASCADE;
@@ -40,11 +44,22 @@ CREATE TABLE StudyGuides_to_Subjects(
     sub_id INT
 );
 
+INSERT INTO StudyGuides_to_Subjects (SG_id, sub_id) values (1, 3);
+INSERT INTO StudyGuides_to_Subjects (SG_id, sub_id) values (2, 2);
+INSERT INTO StudyGuides_to_Subjects (SG_id, sub_id) values (3, 1);
+
 DROP TABLE IF EXISTS StudyGuides_to_Tags CASCADE;
 CREATE TABLE StudyGuides_to_Tags(
     SG_id INT,
     tag_id INT
 );
+
+INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) values (1, 1);
+INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) values (1, 2);
+INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) values (1, 3);
+INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) values (2, 2);
+INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) values (2, 3);
+INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) values (3, 1);
 
 DROP TABLE IF EXISTS LikedStudyGuides_to_Users CASCADE;
 CREATE TABLE LikedStudyGuides_to_Users(
