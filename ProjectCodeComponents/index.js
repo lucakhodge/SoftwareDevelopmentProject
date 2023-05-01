@@ -292,7 +292,7 @@ app.get("/searchResults", (req, res) => {
 	// req.query.sortBy
 
 	// QUERY
-	var dropUnfiltered = "DROP VIEW IF EXISTS resultsUnfiltered;";
+	var dropUnfiltered = "DROP VIEW IF EXISTS resultsUnfiltered CASCADE;";
 	var createUnfiltered =
 		"CREATE VIEW resultsUnfiltered AS SELECT " +
 		"StudyGuides.SG_id AS documentID, " +
@@ -311,7 +311,8 @@ app.get("/searchResults", (req, res) => {
 		"INNER JOIN subjects " +
 		"ON StudyGuides_to_Subjects.sub_id = subjects.sub_id;";
 
-	// var display = "SELECT * FROM documentSearch;";
+	// var displayUnfiltered = "SELECT * FROM resultsUnfiltered;";
+
 	//  documentid | documentname | documentrating | documentlink |        documentsubject        |  documenttag
 	// ------------+--------------+----------------+--------------+-------------------------------+----------------
 	//           1 | Algorithms   |             10 | PDF          | Engineering & Applied Science | Lecture Notes
@@ -321,13 +322,15 @@ app.get("/searchResults", (req, res) => {
 	//           2 | Economics    |              3 | PNG          | Business                      | Practice Tests
 	//           3 | Mythology    |              7 | PSD          | Arts & Sciences               | Lecture Notes
 
-	var dropCombined = "DROP VIEW IF EXISTS resultsCombined;";
+	var dropCombined = "DROP VIEW IF EXISTS resultsCombined CASCADE;";
 	var createCombined =
 		"CREATE VIEW resultsCombined AS SELECT " +
 		"documentID, documentName, documentRating, documentLink, documentSubject, " +
 		"STRING_AGG(documentTag, ', ') AS documentTags " +
-		"FROM documentSearch " +
+		"FROM resultsUnfiltered " +
 		"GROUP BY documentID, documentName, documentRating, documentLink, documentSubject;";
+
+	// var displayCombined = "SELECT * FROM resultsCombined;";
 
 	//  documentid | documentname | documentrating | documentlink |        documentsubject        |              documenttags
 	// ------------+--------------+----------------+--------------+-------------------------------+-----------------------------------------
@@ -375,11 +378,11 @@ app.get("/searchResults", (req, res) => {
 		find = find.slice(0, lastAnd - 1);
 	}
 
+	// sort query depending on input
 	if (req.query.sortBy == "recent") {
 		find = find.concat(");");
 	}
 
-	// sort query depending on input
 	if (req.query.sortBy == "descending") {
 		find = find.concat(`) ORDER BY documentRating DESC;`);
 	}
@@ -396,6 +399,12 @@ app.get("/searchResults", (req, res) => {
 	//         AND(documentTags LIKE '%Lecture Notes%'
 	//             OR DocumentTag LIKE '%Articles%'))
 	// ORDER BY DocumentRating ASC;
+
+	// var searchResults = "SELECT * FROM find;";
+
+	//  documentid | documentname | documentrating | documentlink |        documentsubject        |              documenttags
+	// ------------+--------------+----------------+--------------+-------------------------------+-----------------------------------------
+	//           1 | Algorithms   |             10 | PDF          | Engineering & Applied Science | Lecture Notes, Articles, Practice Tests
 
 	db.task("get-everything", (task) => {
 		task.batch([
