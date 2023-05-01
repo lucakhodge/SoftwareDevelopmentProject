@@ -1,6 +1,17 @@
 <%- include ('../partials/head') %>
 <%- include ('../partials/menu') %>
 <script type="text/javascript" src="https://static.filestackapi.com/v3/filestack.js"></script>
+<script>
+const widget = uploadcare.SingleWidget("[role=uploadcare-uploader]");
+
+// listen to the "upload completed" event
+widget.onUploadComplete(fileInfo => {
+  // get a CDN URL from the file info
+  console.log(fileInfo.cdnUrl);
+});
+</script>
+
+
 
 <main>
   <div class="container">
@@ -14,10 +25,15 @@
           <input type="text" id="fileName" name="fileName" class="form-control" />
         </div>
 
-        <div class="mb-3 form-group">
-          <label for="fileUrl" class="form-label"> File Link: </label>
-          <input type="text" id="fileUrl" name="fileUrl" class="form-control" />
-        </div>
+        <input
+        type="hidden"
+        role="uploadcare-uploader"
+        data-public-key="2e0c82a8db25f4a52e43"
+        data-tabs="file url gdrive gphotos"
+        id="fileUrl"
+        name="fileUrl"
+        class="form-control"
+        />
   
         <div class="mb-3 form-group">
           <label for="subject" class="form-label"> Subject: </label>
