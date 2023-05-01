@@ -10,6 +10,7 @@ const session = require("express-session"); // To set the session object. To sto
 const bcrypt = require("bcrypt"); //  To hash passwords
 const axios = require("axios"); // To make HTTP requests from our server. We'll learn more about it in Part B.
 const read = require("body-parser/lib/read");
+const cloudinary = require('cloudinary').v2;
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -36,6 +37,7 @@ db.connect()
 		console.log("ERROR:", error.message || error);
 	});
 
+<<<<<<< Updated upstream
 //filestack:
 
 app.get("/", (req, res) => {
@@ -111,6 +113,48 @@ function updateForm (result) {
 */
 
 // import uploadcare from "uploadcare-widget/uploadcare.lang.en.min.js";
+=======
+
+
+
+//Cloudinary API:
+
+//configuration
+cloudinary.config({
+  cloud_name: "dfx20hhlk",
+  api_key: "676725369999912",
+  api_secret: "cISXL5XpemBW1clvfGWWUJe1mqg"
+});
+
+const res = cloudinary.uploader.upload('https://upload.wikimedia.org/wikipedia/commons/a/ae/Olympic_flag.jpg', {public_id: "olympic_flag"})
+
+res.then((data) => {
+  console.log(data);
+  console.log(data.secure_url);
+}).catch((err) => {
+  console.log(err);
+});
+
+// Generate 
+const url = cloudinary.url("olympic_flag", {
+  width: 100,
+  height: 150,
+  Crop: 'fill'
+});
+
+
+// The output url
+console.log(url);
+// https://res.cloudinary.com/<cloud_name>/image/upload/h_150,w_100/olympic_flag
+
+
+
+//Uploadcare:
+
+import uploadcare from 'uploadcare-widget/uploadcare.lang.en.min.js'
+
+
+>>>>>>> Stashed changes
 
 // *****************************************************
 // <!-- Section 3 : App Settings -->
@@ -138,8 +182,12 @@ app.use(
 ///////   API ROUTES    //////////
 
 app.get("/", (req, res) => {
+<<<<<<< Updated upstream
 	// res.redirect("/login");
 	res.render("pages/home");
+=======
+	res.redirect("/login");
+>>>>>>> Stashed changes
 });
 
 app.get("/register", (req, res) => {
@@ -148,6 +196,7 @@ app.get("/register", (req, res) => {
 
 // Register
 app.post("/register", async (req, res) => {
+<<<<<<< Updated upstream
 	//hash the password using bcrypt library
 	const hash = await bcrypt.hash(req.body.password, 10);
 	//   res.redirect("/login");
@@ -168,6 +217,30 @@ app.post("/register", async (req, res) => {
 				message: "Could not add username and password into database.",
 			});
 		});
+=======
+
+  //hash the password using bcrypt library
+  const hash = await bcrypt.hash(req.body.password, 10);
+  //   res.redirect("/login");
+  //   res.send(console.log("HERE"));
+  //   res.send(req.body.password);
+
+  const q = "INSERT INTO users VALUES ($1, $2) returning *;";
+  //   const q = "SELECT * FROM users;";
+  // To-DO: Insert username and hashed password into 'users' table
+  db.any(q, [req.body.username, hash])
+    .then((data) => {
+      res.redirect("/login");
+    })
+    .catch((err) => {
+      // console.log("MY ERROR", err);
+      res.status(400).render("pages/register", {
+        error: true,
+        message: "Could not add username and password into database.",
+      });
+    });
+
+>>>>>>> Stashed changes
 });
 
 app.get("/login", (req, res) => {
@@ -175,6 +248,7 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
+<<<<<<< Updated upstream
 	const q = "SELECT * FROM users WHERE username = $1;";
 	db.any(q, [req.body.username])
 		.then(async (data) => {
@@ -451,7 +525,167 @@ app.get("/searchResults", (req, res) => {
 			res.render("pages/search", { documents: [], message: error });
 			return console.log(error);
 		});
+=======
+<<<<<<< HEAD
+  // const q = "SELECT * FROM users WHERE username = $1;";
+  // db.any(q, [req.body.username])
+  //   .then(async (data) => {
+  //     if (data.length === 0) {
+        
+  //       res.render("pages/login", {
+  //         error: true,
+  //         message: "Username does not exist",
+  //         status: "400"
+  //       });
+  //     } else {
+  //       let user = data[0];
+  //       const match = await bcrypt.compare(req.body.password, user.password);
+  //       if (match) {
+  //         req.session.user = user;
+  //         req.session.save();
+  //         // res.json({status: '200', message: 'Success'});
+  //         res.redirect("/discover");
+          
+  //       } else {
+  //         //throw error
+  //         res.render("pages/login", {
+  //           error: true,
+  //           message: "Username and password do not match.",
+  //         });
+  //       }
+  //       // res.send(user);
+  //       res.render("pages/login", {
+  //         error: true,
+  //         message: "Database query failed.",
+  //       });
+  //     }
+  //   })
+  //   .catch((err) => {
+  //     //   res.send(err);
+  //     res.render("pages/login", {
+  //       error: false,
+  //       message: "Logged out sucessfully",
+  //     });
+  //   });
+
+          res.json({
+          error: true,
+          message: "Username does not exist",
+          //status: "400"
+        }).status(400);
+=======
+
+  const q = "SELECT * FROM users WHERE username = $1;";
+  db.any(q, [req.body.username])
+    .then(async (data) => {
+      if (data.length === 0) {
+        //if username not found
+        // res.status(400).render("pages/login", {
+        //   error: true,
+        //   message: "Username does not exist",
+        // });
+        // res.status(400).json({
+        //   error: true,
+        //   message: "Username does not exist",
+        // });
+        // .render("pages/login");
+
+        res.status(400).render("pages/login", {
+          error: true,
+          message: "Username does not exist",
+        });
+      } else {
+        let user = data[0];
+        const match = await bcrypt.compare(req.body.password, user.password);
+        if (match) {
+          //if password matches
+          req.session.user = user;
+          req.session.save();
+          res.status(200).redirect("/home");
+          // res.status(200).json({ status: "200", message: "Success" });
+          // res.status(200).json({ message: "Success" }).redirect("/home");
+        } else {
+          //if password does not match
+          res.status(400).render("pages/login", {
+            error: true,
+            message: "Username and password do not match.",
+          });
+        }
+      }
+    })
+    .catch((err) => {
+      //db query failed
+      res.status(400).render("pages/login", {
+        error: true,
+        message: "Database query failed.",
+      });
+    });
+
+  // res.status(400).json({
+  //   error: true,
+  //   message: "Username does not exist",
+  // });
+
+>>>>>>> 38fdd0f813e53f181c83f2b95c08c0e534a914ee
 });
+
+app.get("/home", (req, res) => {
+	res.render("pages/home");
+});
+
+app.get("/search", (req, res) => {
+	res.render("pages/search");
+>>>>>>> Stashed changes
+});
+
+// EXAMPLE GET API CALL
+
+// app.get("/search-results", (req, res) => {
+//     VARIABLES
+//     req.body.file-name
+//     req.body.subject
+//     req.body.lecture-notes
+//     req.body.articles
+//     req.body.practice-tests
+//     req.body.sort-by
+// });
+
+// app.get("/search_trails", function (req, res) {
+// var search = "SELECT * FROM trails WHERE (";
+
+// if (req.query.location != null) {
+// 	search = search.concat(`location = '${req.query.location}' AND `);
+// }
+
+// if (req.query.elevation_gain != null) {
+// 	search = search.concat(`elevation_gain = ${req.query.elevation_gain} AND `);
+// }
+
+// if (req.query.difficulty != null) {
+// 	search = search.concat(`difficulty = '${req.query.difficulty}' AND `);
+// }
+
+// if (req.query.avg_rating != null) {
+// 	search = search.concat(`avg_rating = ${req.query.avg_rating} AND `);
+// }
+
+// var last = search.lastIndexOf("AND");
+// search = search.slice(0, last - 1);
+// search = search.concat(");");
+
+// console.log(search);
+
+// db.any(search)
+//     .then((data) => {
+//         res.status(201).json({
+// 		status: "search success",
+// 			trails: data,
+// 		});
+// 	})
+// 	.catch(function (err) {
+// 		return console.log(err);
+// 	});
+// });
 
 app.get("/upload", (req, res) => {
 	res.render("pages/upload");
@@ -481,6 +715,13 @@ app.get("/logout", (req, res) => {
 		error: false,
 		message: "Logged out sucessfully",
 	});
+<<<<<<< Updated upstream
+=======
+});
+
+app.get("/welcome", (req, res) => {
+  res.json({ status: "success", message: "Welcome!" });
+>>>>>>> Stashed changes
 });
 
 app.post("/tempUploadFile", (req, res) => {
@@ -587,5 +828,12 @@ app.get("/welcome", (req, res) => {
 
 // starting the server and keeping the connection open to listen for more requests
 module.exports = app.listen(3000);
+<<<<<<< Updated upstream
 // app.listen(3000);
+=======
+<<<<<<< HEAD
+=======
+// app.listen(3000);
+>>>>>>> 38fdd0f813e53f181c83f2b95c08c0e534a914ee
+>>>>>>> Stashed changes
 console.log("Server is listening on port 3000");

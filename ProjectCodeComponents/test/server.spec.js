@@ -1,4 +1,34 @@
 // Imports the index.js file to be tested.
+<<<<<<< Updated upstream
+const server = require("../index"); //TO-DO Make sure the path to your index.js is correctly added
+=======
+<<<<<<< HEAD
+const server = require('../index'); //TO-DO Make sure the path to your index.js is correctly added
+>>>>>>> Stashed changes
+// Importing libraries
+
+// Chai HTTP provides an interface for live integration testing of the API's.
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+chai.should();
+chai.use(chaiHttp);
+const { assert, expect } = chai;
+
+describe("Server!", () => {
+  // Sample test case given to test / endpoint.
+  it("Returns the default welcome message", (done) => {
+    chai
+      .request(server)
+      .get("/welcome")
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+<<<<<<< Updated upstream
+        expect(res.body.status).to.equals("success");
+        assert.strictEqual(res.body.message, "Welcome!");
+=======
+        expect(res.body.status).to.equals('success');
+        assert.strictEqual(res.body.message, 'Welcome!');
+=======
 const server = require("../index"); //TO-DO Make sure the path to your index.js is correctly added
 // Importing libraries
 
@@ -19,12 +49,43 @@ describe("Server!", () => {
         expect(res).to.have.status(200);
         expect(res.body.status).to.equals("success");
         assert.strictEqual(res.body.message, "Welcome!");
+>>>>>>> 38fdd0f813e53f181c83f2b95c08c0e534a914ee
+>>>>>>> Stashed changes
         done();
       });
   });
 
   // ===========================================================================
   // TO-DO: Part A Login unit test case
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+  // it('positive : /login', done => {
+  //   chai
+  //     .request(server)
+  //     .post('/login')
+  //     .send({username: 'John Doe', password: "123"})
+  //     .end((err, res) => {
+  //       expect(res).to.have.status(200);
+  //       expect(res.body.message).to.equals('Success');
+  //       done();
+  //     });
+  // });
+>>>>>>> Stashed changes
+
+  it("positive : /register", (done) => {
+    chai
+      .request(server)
+      .post("/register")
+      .send({username: "abc", password: "123" })
+      .end((err, res) => {
+<<<<<<< Updated upstream
+        expect(res).to.have.status(200);
+        // expect(res.body.message).to.equals("Success");
+=======
+        expect(res).to.have.status(400);
+        expect(res.body.message).to.equals('Username does not exist');
+=======
 
   it("positive : /register", (done) => {
     chai
@@ -34,10 +95,18 @@ describe("Server!", () => {
       .end((err, res) => {
         expect(res).to.have.status(200);
         // expect(res.body.message).to.equals("Success");
+>>>>>>> 38fdd0f813e53f181c83f2b95c08c0e534a914ee
+>>>>>>> Stashed changes
         done();
       });
   });
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+});
+=======
+>>>>>>> Stashed changes
   it("negative : /register", (done) => {
     chai
       .request(server)
@@ -76,3 +145,7 @@ describe("Server!", () => {
 });
   });
 });
+<<<<<<< Updated upstream
+=======
+>>>>>>> 38fdd0f813e53f181c83f2b95c08c0e534a914ee
+>>>>>>> Stashed changes

@@ -1,31 +1,51 @@
+<<<<<<< Updated upstream
 <%- include ('../partials/head') %> 
 <%- include ('../partials/menu') %>
+=======
+<%- include ('../partials/head') %> <%- include ('../partials/menu') %>
+>>>>>>> Stashed changes
 
 <main>
 	<div class="container" style="margin-top: 1em">
 		<%- include ('../partials/message') %>
 
 		<h1>Search</h1>
+<<<<<<< Updated upstream
 		<form action="/searchResults" method="GET">
 			<div class="mb-3 form-group">
 				<label for="fileName" class="form-label"> File Name: </label>
 				<input type="text" id="fileName" name="fileName" class="form-control" />
+=======
+		<form action="/search-results" method="GET">
+			<div class="mb-3 form-group">
+				<label for="file-name" class="form-label"> File Name: </label>
+				<input type="text" id="file-name" name="file-name" class="form-control" />
+>>>>>>> Stashed changes
 			</div>
 
 			<div class="mb-3 form-group">
 				<label for="subject" class="form-label"> Subject: </label>
+<<<<<<< Updated upstream
 				<select class="form-select" id="subject" name="subject">
                     <option value="select">Select a Subject</option>
 					<option value="Arts & Sciences">Arts & Sciences</option>
 					<option value="Business">Business</option>
 					<option value="Engineering & Applied Science">Engineering & Applied Science</option>
 					<option value="Communication">Communication</option>
+=======
+				<select class="form-select" id="subject">
+					<option>Arts & Sciences</option>
+					<option>Business</option>
+					<option>Engineering & Applied Science</option>
+					<option>Communication</option>
+>>>>>>> Stashed changes
 				</select>
 			</div>
 
 			<div class="mb-3 form-group">
 				<label for="sort-by" class="form-label" style="margin-right: 1em"> Tags: </label>
 				<div class="form-check form-check-inline">
+<<<<<<< Updated upstream
 					<input
 						class="form-check-input"
 						type="checkbox"
@@ -51,15 +71,35 @@
 						id="practiceTests"
 						name="practiceTests" />
 					<label class="form-check-label" for="practiceTests"> Practice Tests </label>
+=======
+					<input class="form-check-input" type="checkbox" value="" id="lecture-notes" />
+					<label class="form-check-label" for="lecture-notes"> Lecture Notes </label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input class="form-check-input" type="checkbox" value="" id="articles" />
+					<label class="form-check-label" for="articles"> Articles </label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input class="form-check-input" type="checkbox" value="" id="practice-tests" />
+					<label class="form-check-label" for="practice-tests"> Practice Tests </label>
+>>>>>>> Stashed changes
 				</div>
 			</div>
 
 			<div class="mb-3 form-group">
+<<<<<<< Updated upstream
 				<label for="sortBy" class="form-label"> Sort By: </label>
 				<select class="form-select" id="sortBy" name="sortBy">
 					<option value="recent">Recently Uploaded</option>
 					<option value="descending">Rating, Descending</option>
 					<option value="ascending">Rating, Ascending</option>
+=======
+				<label for="sort-by" class="form-label"> Sort By: </label>
+				<select class="form-select" id="sort-by">
+					<option>Recently Uploaded</option>
+					<option>Rating, Descending</option>
+					<option>Rating, Ascending</option>
+>>>>>>> Stashed changes
 				</select>
 			</div>
 
@@ -69,6 +109,7 @@
 
 	<hr style="margin: 2rem 5rem 1rem 5rem" />
 
+<<<<<<< Updated upstream
 	<div class="container" style="margin: 2em auto 3em auto">
 		<h3>Results</h3>
 		<table style="width: 100%; border-collapse: separate; border-spacing: 0 .5em;" >
@@ -92,6 +133,10 @@
 			    <% }); %> 
             <% } %>
 		</table>
+=======
+	<div class="container" style="margin-top: 2em">
+		<h3>Results</h3>
+>>>>>>> Stashed changes
 	</div>
 </main>
 
