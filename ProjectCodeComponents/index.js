@@ -295,21 +295,21 @@ app.get("/searchResults", (req, res) => {
 	var dropUnfiltered = "DROP VIEW IF EXISTS resultsUnfiltered;";
 	var createUnfiltered =
 		"CREATE VIEW resultsUnfiltered AS SELECT " +
-		    "StudyGuides.SG_id AS documentID, " +
-		    "StudyGuides.name AS documentName, " +
-		    "StudyGuides.likes AS documentRating, " +
-		    "StudyGuides.datalink AS documentLink, " +
-		    "subjects.sub_name AS documentSubject, " +
-		    "tags.tag_name AS documentTag " +
+		"StudyGuides.SG_id AS documentID, " +
+		"StudyGuides.name AS documentName, " +
+		"StudyGuides.likes AS documentRating, " +
+		"StudyGuides.datalink AS documentLink, " +
+		"subjects.sub_name AS documentSubject, " +
+		"tags.tag_name AS documentTag " +
 		"FROM StudyGuides " +
-		    "INNER JOIN StudyGuides_to_Tags " +
-		        "ON StudyGuides_to_Tags.SG_id = StudyGuides.SG_id " +
-		    "INNER JOIN tags " +
-		        "ON StudyGuides_to_Tags.tag_id = tags.tag_id " +
-		    "INNER JOIN StudyGuides_to_Subjects " +
-		        "ON StudyGuides_to_Subjects.SG_id = StudyGuides.SG_id " +
-		    "INNER JOIN subjects " +
-		        "ON StudyGuides_to_Subjects.sub_id = subjects.sub_id;";
+		"INNER JOIN StudyGuides_to_Tags " +
+		"ON StudyGuides_to_Tags.SG_id = StudyGuides.SG_id " +
+		"INNER JOIN tags " +
+		"ON StudyGuides_to_Tags.tag_id = tags.tag_id " +
+		"INNER JOIN StudyGuides_to_Subjects " +
+		"ON StudyGuides_to_Subjects.SG_id = StudyGuides.SG_id " +
+		"INNER JOIN subjects " +
+		"ON StudyGuides_to_Subjects.sub_id = subjects.sub_id;";
 
 	// var display = "SELECT * FROM documentSearch;";
 	//  documentid | documentname | documentrating | documentlink |        documentsubject        |  documenttag
@@ -324,10 +324,10 @@ app.get("/searchResults", (req, res) => {
 	var dropCombined = "DROP VIEW IF EXISTS resultsCombined;";
 	var createCombined =
 		"CREATE VIEW resultsCombined AS SELECT " +
-		    "documentID, documentName, documentRating, documentLink, documentSubject, " +
-		    "STRING_AGG(documentTag, ', ') AS documentTags " +
+		"documentID, documentName, documentRating, documentLink, documentSubject, " +
+		"STRING_AGG(documentTag, ', ') AS documentTags " +
 		"FROM documentSearch " +
-		    "GROUP BY documentID, documentName, documentRating, documentLink, documentSubject;";
+		"GROUP BY documentID, documentName, documentRating, documentLink, documentSubject;";
 
 	//  documentid | documentname | documentrating | documentlink |        documentsubject        |              documenttags
 	// ------------+--------------+----------------+--------------+-------------------------------+-----------------------------------------
@@ -346,7 +346,10 @@ app.get("/searchResults", (req, res) => {
 		find = find.concat(`documentSubject = '${req.query.subject}' AND `);
 	}
 
-	if (req.query.lectureNotes != null || req.query.articles != null || req.query.practiceTests != null
+	if (
+		req.query.lectureNotes != null ||
+		req.query.articles != null ||
+		req.query.practiceTests != null
 	) {
 		find = find.concat(" (");
 

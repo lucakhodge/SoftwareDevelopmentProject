@@ -19,7 +19,7 @@ CREATE TABLE tags(
 );
 
 INSERT INTO tags (tag_id, tag_name) values (1, 'Lecture Notes');
-INSERT INTO tags (tag_id, tag_name) values (2, 'Articles');
+INSERT INTO tags (tag_id, tag_name) values (2, 'Article');
 INSERT INTO tags (tag_id, tag_name) values (3, 'Practice Tests');
 
 DROP TABLE IF EXISTS subjects CASCADE;
