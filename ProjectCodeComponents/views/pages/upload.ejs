@@ -1,7 +1,17 @@
 <%- include ('../partials/head') %>
 <%- include ('../partials/menu') %>
 <script type="text/javascript" src="https://static.filestackapi.com/v3/filestack.js"></script>
+<script>
 
+          const widget = uploadcare.Widget('[role=uploadcare-uploader]');
+
+          // listen to the "upload completed" event
+          widget.onUploadComplete(info => {
+            // get CDN URL from file information. Here you can generate a thumbnail using the file URL, save the URL to DB, etc.
+            console.log("CDNURL FOR IMAGE : ", info.cdnUrl);
+          });
+
+        </script>
 <main>
   <div class="container">
     <!-- THE REST OF YOUR HTML CODE GOES HERE -->
@@ -14,10 +24,26 @@
           <input type="text" id="fileName" name="fileName" class="form-control" />
         </div>
 
+
         <div class="mb-3 form-group">
+
+          <input
+        type="hidden"
+        role="uploadcare-uploader"
+        data-public-key="2e0c82a8db25f4a52e43"
+        data-tabs="file url gdrive gphotos"
+        id="cdnURL"
+        name="fileURL"
+        class="form-control"
+        />
+
+        </div>
+
+
+        <!-- <div class="mb-3 form-group">
           <label for="fileUrl" class="form-label"> File Link: </label>
           <input type="text" id="fileUrl" name="fileUrl" class="form-control" />
-        </div>
+        </div> -->
   
         <div class="mb-3 form-group">
           <label for="subject" class="form-label"> Subject: </label>
