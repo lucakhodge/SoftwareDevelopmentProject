@@ -237,33 +237,51 @@ app.get("/profile", (req, res) => {
 		//case: not logged in
 		res.redirect("/login");
 	}
-	q = "SELECT name AS title, username, likes, dataLink AS link FROM StudyGuides LIMIT 5;";
-	db.any(q, [])
-		.then((data) => {
+	qUploaded =
+		"SELECT name AS title, username, likes, dataLink AS link FROM StudyGuides WHERE username = $1 ;";
+	qLiked =
+		"SELECT StudyGuides.name AS title, StudyGuides.username, StudyGuides.likes, StudyGuides.dataLink AS link FROM StudyGuides INNER JOIN LikedStudyGuides_to_Users ON StudyGuides.SG_id = LikedStudyGuides_to_Users.SG_id WHERE LikedStudyGuides_to_Users.username = $1 ;";
+	db.any(qUploaded, [username])
+		.then((data1) => {
 			// res.json(data);
-			res.render("pages/profile", {
-				username: username,
-				uploaded: data,
-				liked: [
-					{ title: "liked 1", link: "ll1" },
-					{ title: "liked 2", link: "ll2" },
-				],
-			});
+			db.any(qLiked, [username])
+				.then((data2) => {
+					res.render("pages/profile", {
+						username: username,
+						uploaded: data1,
+						liked: data2,
+					});
+				})
+				.catch((err) => {
+					res.render("pages/profile", {
+						username: username,
+						uploaded: data1,
+						liked: [],
+						error: true,
+						message: "Failed retrieving liked." + err,
+					});
+				});
 		})
 		.catch((err) => {
-			res.render("pages/profile", {
-				username: username,
-				uploaded: [
-					{ title: "upload 1", link: "ul1" },
-					{ title: "upload 2", link: "ul2" },
-					{ title: "upload 3", link: "ul3" },
-					{ title: "i guess 4", link: "ul4" },
-				],
-				liked: [
-					{ title: "liked 1", link: "ll1" },
-					{ title: "liked 2", link: "ll2" },
-				],
-			});
+			db.any(qLike, [username])
+				.then((data2) => {
+					res.render("pages/profile", {
+						username: [],
+						uploaded: [],
+						liked: data2,
+						error: true,
+						message: "Failed retrieving uploaded.",
+					});
+				})
+				.catch((err) => {
+					res.render("pages/profile", {
+						username: username,
+						uploaded: [],
+						liked: [],
+						error: true,
+						message: "Failed retriving uploaded and liked.",
+					});
+				});
 		});
 });
 
