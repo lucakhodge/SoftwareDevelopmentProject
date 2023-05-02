@@ -231,58 +231,58 @@ app.get("/profile", (req, res) => {
 	var username;
 	// if (isLoggedIn(req.session)) {
 	if (req.session.hasOwnProperty("user")) {
-		//case: logged in
-		username = req.session.user.username;
+	  //case: logged in
+	  username = req.session.user.username;
 	} else {
-		//case: not logged in
-		res.redirect("/login");
+	  //case: not logged in
+	  res.redirect("/login");
 	}
 	qUploaded =
-		"SELECT name AS title, username, likes, dataLink AS link FROM StudyGuides WHERE username = $1 ;";
+	  "SELECT SG_id AS id, name AS title, username, likes, dataLink AS link FROM StudyGuides WHERE username = $1 ;";
 	qLiked =
-		"SELECT StudyGuides.name AS title, StudyGuides.username, StudyGuides.likes, StudyGuides.dataLink AS link FROM StudyGuides INNER JOIN LikedStudyGuides_to_Users ON StudyGuides.SG_id = LikedStudyGuides_to_Users.SG_id WHERE LikedStudyGuides_to_Users.username = $1 ;";
+	  "SELECT StudyGuides.SG_id AS id, StudyGuides.name AS title, StudyGuides.username, StudyGuides.likes, StudyGuides.dataLink AS link FROM StudyGuides INNER JOIN LikedStudyGuides_to_Users ON StudyGuides.SG_id = LikedStudyGuides_to_Users.SG_id WHERE LikedStudyGuides_to_Users.username = $1 ;";
 	db.any(qUploaded, [username])
-		.then((data1) => {
-			// res.json(data);
-			db.any(qLiked, [username])
-				.then((data2) => {
-					res.render("pages/profile", {
-						username: username,
-						uploaded: data1,
-						liked: data2,
-					});
-				})
-				.catch((err) => {
-					res.render("pages/profile", {
-						username: username,
-						uploaded: data1,
-						liked: [],
-						error: true,
-						message: "Failed retrieving liked." + err,
-					});
-				});
-		})
-		.catch((err) => {
-			db.any(qLike, [username])
-				.then((data2) => {
-					res.render("pages/profile", {
-						username: [],
-						uploaded: [],
-						liked: data2,
-						error: true,
-						message: "Failed retrieving uploaded.",
-					});
-				})
-				.catch((err) => {
-					res.render("pages/profile", {
-						username: username,
-						uploaded: [],
-						liked: [],
-						error: true,
-						message: "Failed retriving uploaded and liked.",
-					});
-				});
-		});
+	  .then((data1) => {
+		// res.json(data);
+		db.any(qLiked, [username])
+		  .then((data2) => {
+			res.render("pages/profile", {
+			  username: username,
+			  uploaded: data1,
+			  liked: data2,
+			});
+		  })
+		  .catch((err) => {
+			res.render("pages/profile", {
+			  username: username,
+			  uploaded: data1,
+			  liked: [],
+			  error: true,
+			  message: "Failed retrieving liked." + err,
+			});
+		  });
+	  })
+	  .catch((err) => {
+		db.any(qLike, [username])
+		  .then((data2) => {
+			res.render("pages/profile", {
+			  username: [],
+			  uploaded: [],
+			  liked: data2,
+			  error: true,
+			  message: "Failed retrieving uploaded.",
+			});
+		  })
+		  .catch((err) => {
+			res.render("pages/profile", {
+			  username: username,
+			  uploaded: [],
+			  liked: [],
+			  error: true,
+			  message: "Failed retriving uploaded and liked.",
+			});
+		  });
+	  });
 });
 
 app.get("/search", (req, res) => {
@@ -458,7 +458,43 @@ app.get("/upload", (req, res) => {
 });
 
 app.get("/display", (req, res) => {
-	res.render("pages/display", req.query);
+	var username;
+  if (req.session.hasOwnProperty("user")) {
+    username = req.session.user.username;
+  } else {
+    res.redirect("/login");
+  }
+  // q =
+  //   "SELECT SG_id AS id, name AS title, username, likes, dataLink AS link FROM StudyGuides WHERE id = $1 ;";
+  q =
+    "SELECT SG_id AS id, name AS title, username, likes, dataLink AS link FROM StudyGuides WHERE SG_id = $1 ;";
+  db.any(q, [req.query.id])
+    .then((data) => {
+      q2 =
+        "SELECT COUNT(*) FROM LikedStudyGuides_to_Users WHERE SG_id = $1 AND username = $2 ;";
+      db.any(q2, [req.query.id, username])
+        .then((data2) => {
+          liked = false;
+          if (data2[0].count > 0) liked = true;
+          data3 = data[0];
+          data3.liked = liked;
+          res.render("pages/display", data3);
+          // res.json(data2);
+        })
+        .catch((err) => {
+          res.json(err);
+        });
+      // res.json(data);
+    })
+    .catch((err) => {
+      // todo: where should it redirect
+      // res.render("pages/profile", {
+      //   username: username,
+      //   message: "could not find that study guide in data base.",
+      //   error: true,
+      // });
+      res.json(err);
+    });
 });
 
 // app.get("/displaytest", (req, res) => {
@@ -468,7 +504,41 @@ app.get("/display", (req, res) => {
 // });
 
 app.post("/like", (req, res) => {
-	res.redirect("/display");
+	var username;
+  if (req.session.hasOwnProperty("user")) {
+    username = req.session.user.username;
+  } else {
+    res.redirect("/login");
+  }
+
+  q =
+    "INSERT INTO LikedStudyGuides_to_Users (SG_id, username) values ($1, $2) ;";
+  db.any(q, [req.body.id, username])
+    .then((data) => {
+      res.redirect("/display?id=" + req.body.id);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
+
+app.post("/unlike", (req, res) => {
+  var username;
+  if (req.session.hasOwnProperty("user")) {
+    username = req.session.user.username;
+  } else {
+    res.redirect("/login");
+  }
+
+  q =
+    "DELETE FROM LikedStudyGuides_to_Users WHERE SG_id = $1 AND username = $2;";
+  db.any(q, [req.body.id, username])
+    .then((data) => {
+      res.redirect("/display?id=" + req.body.id);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 });
 
 // app.post("/display", (req, res) => {
