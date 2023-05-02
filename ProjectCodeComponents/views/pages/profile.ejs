@@ -30,7 +30,8 @@
                     <tr>
                         <td ><%-item.title%></td>
                         <td > 
-                          <a href=<%- "/display?title=" + item.title + "&link=" + item.link + "&likes=" +item.likes %> >
+                          <!-- <a href=<%- "/display?title=" + item.title + "&link=" + item.link + "&likes=" +item.likes + "&id=" +item.id %> > -->
+                            <a href=<%- "/display?id=" + item.id %> >
                             <button type="button" class="btn btn-primary">Visit</button>
                          </a>
                          
@@ -58,7 +59,7 @@
                   <% liked.forEach((item)=>{ %>
                       <tr>
                           <td ><%-item.title%></td>
-                          <td ><a href=<%- "/display?title=" + item.title + "&link=" + item.link + "&likes=" +item.likes %> >
+                          <td ><a href=<%- "/display?id=" + item.id %> >
                             <button type="button" class="btn btn-primary">Visit</button>
                          </a></td>
                       </tr>
