@@ -14,10 +14,11 @@ widget.onUploadComplete(fileInfo => {
 
 
 <main>
-  <div class="container">
+  <div class="container" style="margin-top: 1em">
     <!-- THE REST OF YOUR HTML CODE GOES HERE -->
       <%- include  ('../partials/message') %>
-
+      <h1><u>Upload file:</u></h1>
+      <br>
       <form action="/uploadFile" method="POST">
 
         <div class="mb-3 form-group">
@@ -34,8 +35,8 @@ widget.onUploadComplete(fileInfo => {
         name="fileUrl"
         class="form-control"
         />
-  
         <div class="mb-3 form-group">
+          <br>
           <label for="subject" class="form-label"> Subject: </label>
           <select class="form-select" id="subject" name="subject">
             <option value="1">Arts & Sciences</option>
