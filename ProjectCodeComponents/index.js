@@ -174,6 +174,10 @@ app.get("/login", (req, res) => {
 	res.render("pages/login");
 });
 
+app.get("/discover", (req, res) => {
+  res.render("pages/discover");
+});
+
 app.post("/login", async (req, res) => {
 	const q = "SELECT * FROM users WHERE username = $1;";
 	db.any(q, [req.body.username])
