@@ -475,6 +475,7 @@ app.get("/display", (req, res) => {
     username = req.session.user.username;
   } else {
     res.redirect("/login");
+    return;
   }
   // q =
   //   "SELECT SG_id AS id, name AS title, username, likes, dataLink AS link FROM StudyGuides WHERE id = $1 ;";
