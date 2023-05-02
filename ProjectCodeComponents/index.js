@@ -592,49 +592,54 @@ app.post("/uploadFile", (req, res) => {
 		});
 	}
 
+	if(fileName === ''){res.status(400).render("pages/upload", {
+		error: true,
+		message: "Fill Out File Name",
+	});}
+
 	//   const tempImg =
 	//     "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1024-512,f_auto,q_auto:best/streams/2013/January/130122/1B5672956-g-hlt-130122-puppy-1143a.jpg";
-
+	else{
 	const q =
 		"INSERT INTO StudyGuides (name, username, likes, dataLink) VALUES ($1, $2, $3, $4) returning *;";
 
-	db.any(q, [fileName, username, "0", req.body.fileUrl])
-		.then((data) => {
-			const SG_ID = data[0].sg_id;
-			(async () => {
-				if (tags) {
-					for (const tag of tags) {
-						console.log("Test4", tag, tags);
-						await db
-							.none(
-								"INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) VALUES ($1, $2)",
-								[SG_ID, tag]
-							)
-							.then(() => {
-								console.log("Tag inserted");
-							})
-							.catch((error) => console.error(error));
+		db.any(q, [fileName, username, "0", req.body.fileUrl])
+			.then((data) => {
+				const SG_ID = data[0].sg_id;
+				(async () => {
+					if (tags) {
+						for (const tag of tags) {
+							console.log("Test4", tag, tags);
+							await db
+								.none(
+									"INSERT INTO StudyGuides_to_Tags (SG_id, tag_id) VALUES ($1, $2)",
+									[SG_ID, tag]
+								)
+								.then(() => {
+									console.log("Tag inserted");
+								})
+								.catch((error) => console.error(error));
+						}
+						console.log("All tags inserted");
+					} else {
+						console.log("No tags to insert");
 					}
-					console.log("All tags inserted");
-				} else {
-					console.log("No tags to insert");
-				}
-			})();
-			db.none("INSERT INTO StudyGuides_to_Subjects (SG_id, sub_id) values ($1, $2)",
-			[SG_ID, subject])
-			.then(() => {
-				console.log("Inserted Subject")
+				})();
+				db.none("INSERT INTO StudyGuides_to_Subjects (SG_id, sub_id) values ($1, $2)",
+				[SG_ID, subject])
+				.then(() => {
+					console.log("Inserted Subject")
+				})
 			})
-		})
 
-		.catch((err) => {
-			console.log(err);
-			res.status(400).render("pages/upload", {
-				error: true,
-				message: "Upload Failure",
+			.catch((err) => {
+				console.log(err);
+				res.status(400).render("pages/upload", {
+					error: true,
+					message: "Upload Failure",
+				});
 			});
-		});
-
+		
 	db.any("SELECT * FROM StudyGuides_to_Tags")
 		.then((result) => {
 			console.log("Data from StudyGuides_to_Tags:", result);
@@ -663,6 +668,7 @@ app.post("/uploadFile", (req, res) => {
 		console.error(error);
 		res.send("Error retrieving Subjects data");
 	});
+	}
 });
 
 app.get("/welcome", (req, res) => {
