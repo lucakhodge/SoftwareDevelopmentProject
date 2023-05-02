@@ -480,19 +480,29 @@ app.get("/display", (req, res) => {
   // q =
   //   "SELECT SG_id AS id, name AS title, username, likes, dataLink AS link FROM StudyGuides WHERE id = $1 ;";
   q =
-    "SELECT SG_id AS id, name AS title, username, likes, dataLink AS link FROM StudyGuides WHERE SG_id = $1 ;";
+    "SELECT SG_id AS id, name AS title, username, dataLink AS link FROM StudyGuides WHERE SG_id = $1 ;";
   db.any(q, [req.query.id])
     .then((data) => {
       q2 =
         "SELECT COUNT(*) FROM LikedStudyGuides_to_Users WHERE SG_id = $1 AND username = $2 ;";
       db.any(q2, [req.query.id, username])
         .then((data2) => {
-          liked = false;
-          if (data2[0].count > 0) liked = true;
-          data3 = data[0];
-          data3.liked = liked;
-          res.render("pages/display", data3);
-          // res.json(data2);
+          q3 =
+            "SELECT COUNT(*) FROM LikedStudyGuides_to_Users WHERE SG_id = $1;";
+          db.any(q3, [req.query.id])
+            .then((data3) => {
+              liked = false;
+              if (data2[0].count > 0) liked = true;
+              likes = data3[0].count;
+              data4 = data[0];
+              data4.liked = liked;
+              data4.likes = likes;
+              res.render("pages/display", data4);
+              // res.json(data2);
+            })
+            .catch((err) => {
+              res.json(err);
+            });
         })
         .catch((err) => {
           res.json(err);
