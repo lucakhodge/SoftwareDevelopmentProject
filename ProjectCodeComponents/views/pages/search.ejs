@@ -88,7 +88,7 @@
                         <td> <%-documents.documentrating %> </td>
                         <td> <%-documents.documentsubject %> </td>
                         <td> <%-documents.documenttags %> </td>
-				        <td><a class="btn btn-primary" href="<%-documents.documentlink %>">Open</a></td>
+				        <td><a class="btn btn-primary" href= <%- "/display?id=" + documents.documentid %> >View</a></td>
                     </tr>
 			    <% }); %> 
             <% } %>
