@@ -1,19 +1,20 @@
-<%- include ('../partials/head') %>
-<%- include ('../partials/menu') %>
+<%- include ('../partials/head') %> <%- include ('../partials/menu') %>
 
 <main>
-  <img src="library.jpg" style="height:350px; width: 100%;" alt="library">
-  <div class="container" style="margin-top: 1em">
-    <!-- THE REST OF YOUR HTML CODE GOES HERE -->
-      <%- include  ('../partials/message') %>
-      <div class="col-md-8 mx-auto text-center">
-      <img src="favicon-big.png" style="height: 100px; width: 100px;">
-      <h1 class="mb-3 fw-semibold lh-1">Learn fast, immense study guides available for you with Bookshelf.init</h1>
-      <button type="button" class="btn btn-dark"><a class="nav-link" href="/login">Get Started!</a></button>
-      </div>
-
-        
-  </div>
+	<img src="library.jpg" style="height: 350px; width: 100%" alt="library" />
+	<div class="container" style="margin: 1em auto 1em auto">
+		<!-- THE REST OF YOUR HTML CODE GOES HERE -->
+		<%- include ('../partials/message') %>
+		<div class="col-md-8 mx-auto text-center">
+			<img src="favicon-big.png" style="height: 100px; width: 100px" />
+			<h1 class="mb-3 fw-semibold lh-1">
+				Learn fast, immense study guides available for you with Bookshelf.init
+			</h1>
+			<button type="button" class="btn btn-dark">
+				<a class="nav-link" href="/login">Get Started!</a>
+			</button>
+		</div>
+	</div>
 </main>
 
 <%- include ('../partials/footer') %>
